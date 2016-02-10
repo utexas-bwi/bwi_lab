@@ -4,6 +4,8 @@ project(bwilab_scripts)
 find_package(catkin REQUIRED roslint)
 catkin_package()
 
+catkin_python_setup()
+
 ###########
 ## Build ##
 ###########
@@ -24,7 +26,9 @@ install(PROGRAMS scripts/clone_server scripts/upload
 #############
 
 # Lint Python modules
-roslint_python(${${PROJECT_NAME}_PY_SCRIPTS})
+file(GLOB_RECURSE ${PROJECT_NAME}_PY_SRCS
+     RELATIVE ${PROJECT_SOURCE_DIR} src/${PROJECT_NAME}/*.py)
+roslint_python(${${PROJECT_NAME}_PY_SCRIPTS} ${${PROJECT_NAME}_PY_SRCS})
 
 #if (CATKIN_ENABLE_TESTING)
 #  add_subdirectory(tests)

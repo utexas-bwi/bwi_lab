@@ -5,7 +5,7 @@ from __future__ import absolute_import, print_function
 
 import datetime
 import sys
-from bwi_logging.bagfile import distance_traveled
+from bwilab_scripts.bagfile import distance_traveled
 
 if __name__ == '__main__':
 
