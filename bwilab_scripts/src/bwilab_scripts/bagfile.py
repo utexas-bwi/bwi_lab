@@ -44,6 +44,7 @@ from __future__ import absolute_import, print_function
 import os
 import rosbag
 
+
 def distance_traveled(filename):
     """Compute distance traveled and time consumed.
 
