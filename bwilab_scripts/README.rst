@@ -8,6 +8,26 @@ Wide Intelligence project for the University of Texas at Austin.
 Scripts
 =======
 
+clone_server
+------------
+
+Download all saved bag files from the BWI lab server under the current
+directory.  This copies the bags using ``rsync``, which will not copy
+previously cloned files again.
+
+Example
+'''''''
+
+First, change to a directory where you want the bags copied, then run
+the script::
+
+    $ mkdir -p ~/logs
+    $ cd ~/logs
+    $ rosrun bwilab_scripts clone_server
+
+This creates a ``~/logs/robot`` directory containing subdirectories
+named after each robot, which contain the bags for each robot.
+
 distance_traveled
 -----------------
 
@@ -17,11 +37,13 @@ in ".bag" are reported as having zero duration and zero distance.
 
 Usage
 '''''
+
 ::
     rosrun bwilab_scripts distance_traveled bag1 [bag2 ...]
 
 Example
 '''''''
+
 ::
     $ rosrun bwilab_scripts distance_traveled bwi_2016-01-06-11-13-34.bag  
       time: 2:04:08  distance: 2999.99  filename: bwi_2016-01-06-11-13-34.bag
