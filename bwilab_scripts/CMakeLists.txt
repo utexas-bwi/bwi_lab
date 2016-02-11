@@ -18,7 +18,10 @@ set(${PROJECT_NAME}_PY_SCRIPTS scripts/distance_traveled)
 catkin_install_python(PROGRAMS ${${PROJECT_NAME}_PY_SCRIPTS}
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(PROGRAMS scripts/clone_server scripts/upload
+install(PROGRAMS
+          scripts/clone_server
+          scripts/keygen
+          scripts/upload
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############

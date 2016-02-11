@@ -1,9 +1,9 @@
 Overview
 ========
 
-The `bwilab_scripts`_ ROS_ package provides administration scripts and
-other programs for managing the systems and networks of the Building
-Wide Intelligence project for the University of Texas at Austin.
+This ROS_ package provides administration scripts and other programs
+for managing the systems and networks of the Building-Wide
+Intelligence (BWI_) project of the University of Texas at Austin.
 
 Scripts
 =======
@@ -27,6 +27,19 @@ the script::
 
 This creates a ``~/logs/robot`` directory containing subdirectories
 named after each robot, which contain the bags for each robot.
+
+keygen
+------
+
+Generate ssh keys for accessing the main BWI server without a
+password.  This is intended for use of the local ``bwilab`` account on
+each robot.  For that account, **do not** supply a passphrase.
+
+Example
+'''''''
+
+::
+    $ rosrun bwilab_scripts keygen
 
 distance_traveled
 -----------------
@@ -83,6 +96,6 @@ To force a specific host name::
     HOSTNAME=bender rosrun bwilab_scripts upload
 
 
-.. _`bwilab_scripts`: http://wiki.ros.org/bwilab_scripts
+.. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/
 .. _ROS: http:/ros.org
 .. _`rosbag`: http://wiki.ros.org/rosbag

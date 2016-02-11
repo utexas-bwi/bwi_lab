@@ -1,0 +1,20 @@
+#!/bin/bash
+
+## Generate ssh keys for access to server.
+
+if [ "$#" -gt "0" ]
+then    echo "usage: `basename $0`"
+        echo ""
+        echo "Generate ssh keys for accessing the main BWI server"
+        echo "without a password."
+        exit 1
+fi
+
+SERVER=nixons-head.csres.utexas.edu
+KEYFILE=~/.ssh/id_rsa
+
+if /usr/bin/ssh-keygen -q -t rsa -f $KEYFILE
+then    cat $KEYFILE.pub | ssh -p40 $SERVER "cat >>  ~/.ssh/authorized_keys"
+else    echo 'ssh key generation failed'
+        return 9
+fi
