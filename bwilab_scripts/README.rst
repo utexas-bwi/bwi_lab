@@ -33,7 +33,8 @@ keygen
 
 Generate ssh keys for accessing the main BWI server without a
 password.  This is intended for use of the local ``bwilab`` account on
-each robot.  For that account, **do not** supply a passphrase.
+each robot.  For that account, supply an empty passphrase, when
+requested.
 
 Example
 '''''''

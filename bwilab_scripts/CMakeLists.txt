@@ -12,7 +12,6 @@ catkin_python_setup()
 ## Build ##
 ###########
 
-message(${Boost_LIBRARIES})
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 add_executable(bwilab src/authorization/bwilab.cpp)
 target_link_libraries(bwilab ${catkin_LIBRARIES} ${Boost_LIBRARIES})
@@ -20,6 +19,16 @@ target_link_libraries(bwilab ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 #############
 ## Install ##
 #############
+
+# NOTE: the "bwilab" executable is installed setuid in /usr/local/bin,
+# and not in the usual ${CATKIN_PACKAGE_BIN_DESTINATION}.
+install(TARGETS bwilab
+        RUNTIME DESTINATION bin
+        PERMISSIONS
+          OWNER_READ OWNER_WRITE OWNER_EXECUTE
+          GROUP_READ GROUP_EXECUTE
+          WORLD_READ WORLD_EXECUTE
+          SETUID)
 
 set(${PROJECT_NAME}_PY_SCRIPTS scripts/distance_traveled)
 catkin_install_python(PROGRAMS ${${PROJECT_NAME}_PY_SCRIPTS}
