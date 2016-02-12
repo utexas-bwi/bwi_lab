@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(bwilab_scripts)
 
-find_package(catkin REQUIRED roslint)
+find_package(catkin REQUIRED COMPONENTS roslint)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
+
 catkin_package()
 
 catkin_python_setup()
@@ -9,6 +11,11 @@ catkin_python_setup()
 ###########
 ## Build ##
 ###########
+
+message(${Boost_LIBRARIES})
+include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+add_executable(bwilab src/authorization/bwilab.cpp)
+target_link_libraries(bwilab ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #############
 ## Install ##
