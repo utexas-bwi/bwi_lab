@@ -42,13 +42,12 @@ to run under the @c bwilab user account.
 
 */
 
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <stdio.h>
 #include <unistd.h>
-#include <boost/filesystem.hpp>
 
-// Path to directory containing allowed scripts.
+// Path to directory containing authorized scripts.
 const std::string CMD_DIR("/usr/local/lib/bwilab_scripts");
 
 int main(int argc, char *argv[])
@@ -62,27 +61,17 @@ int main(int argc, char *argv[])
       return 9;
     }
 
-  using boost::filesystem::is_directory;
-  using boost::filesystem::path;
+  // std::cout << "Real UID: " << getuid()
+  //           << ", effective UID: " << geteuid() << std::endl;
 
-  path cmd_path(CMD_DIR);
-  if (!is_directory(cmd_path))
-    {
-      std::cerr << "error: " << CMD_DIR
-                << " directory does not exist" << std::endl;
-      return 2;
-    }
+  std::string resolved_cmd_path = CMD_DIR + '/' + argv[1];
+  std::cout << "Command path: " << resolved_cmd_path << std::endl;
 
-  std::string cmd = argv[1];
-  std::cout << "Command to run: " << cmd << std::endl;
-  std::string resolved_cmd_path = CMD_DIR + '/' + cmd;
-  std::cout << "Command path: " << cmd << std::endl;
-
-  // execute the desired program with the current environment
+  // execute the desired program using the current environment
   int rc = execv(resolved_cmd_path.c_str(), argv+1);
-  // execv should NOT return
+  // execv SHOULD NOT return
 
-  std::string error_str = "error: " + resolved_cmd_path + " exec failed";
+  std::string error_str = "error: exec " + resolved_cmd_path + " failed";
   perror(error_str.c_str());
   return 1;
 }
