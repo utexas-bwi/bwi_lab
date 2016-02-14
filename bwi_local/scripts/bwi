@@ -1,0 +1,16 @@
+#!/bin/bash
+
+## Run a script in the /usr/local/lib/bwi_local directory.
+
+if [ $# -lt 2 ]
+then    echo "usage: `basename $0` command [args]"
+        exit 9
+fi
+
+CMD_DIR="/usr/local/lib/bwi_local"
+
+cmd=$1
+shift
+shift
+echo $CMD_DIR/$cmd $*
+#exec $CMD_DIR/$cmd $*
