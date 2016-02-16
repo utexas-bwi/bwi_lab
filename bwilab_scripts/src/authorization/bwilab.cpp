@@ -35,21 +35,43 @@
 
 /** @file
 
-@brief running scripts under a different user ID.
+@brief Run scripts under a different user ID.
 
 This is a POSIX program for authorizing a constrained set of scripts
 to run under the @c bwilab user account.
 
 */
 
+#include <iostream>
 #include <string>
-#include <boost/filesystem.hpp>
+#include <stdio.h>
+#include <unistd.h>
 
-//#include <sys/types.h>
-//#include <unistd.h>
-//#include <stdlib.h>
+// Path to directory containing authorized scripts.
+const std::string CMD_DIR("/usr/local/lib/bwilab_scripts");
 
 int main(int argc, char *argv[])
 {
-  std::string exec_name = argv[0];
+  std::string exec_path = argv[0];
+
+  if (argc < 2)
+    {
+      std::cerr << "usage: " << exec_path
+                << " command [ args ]" << std::endl;
+      return 9;
+    }
+
+  // std::cout << "Real UID: " << getuid()
+  //           << ", effective UID: " << geteuid() << std::endl;
+
+  std::string resolved_cmd_path = CMD_DIR + '/' + argv[1];
+  std::cout << "Command path: " << resolved_cmd_path << std::endl;
+
+  // execute the desired program using the current environment
+  int rc = execv(resolved_cmd_path.c_str(), argv+1);
+  // execv SHOULD NOT return
+
+  std::string error_str = "error: exec " + resolved_cmd_path + " failed";
+  perror(error_str.c_str());
+  return 1;
 }

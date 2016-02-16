@@ -5,61 +5,13 @@ This ROS_ package provides administration scripts and other programs
 for managing the systems and networks of the Building-Wide
 Intelligence (BWI_) project of the University of Texas at Austin.
 
+These scripts are authorized to run under the local ``bwilab`` user
+account, which is configured to login to the BWI server without
+requiring a password.  For security, these scripts should be kept
+simple and do no more than necessary.
+
 Scripts
 =======
-
-clone_server
-------------
-
-Download all saved bag files from the BWI lab server under the current
-directory.  This copies the bags using ``rsync``, which will not copy
-previously cloned files again.
-
-Example
-'''''''
-
-First, change to a directory where you want the bags copied, then run
-the script::
-
-    $ mkdir -p ~/logs
-    $ cd ~/logs
-    $ rosrun bwilab_scripts clone_server
-
-This creates a ``~/logs/robot`` directory containing subdirectories
-named after each robot, which contain the bags for each robot.
-
-keygen
-------
-
-Generate ssh keys for accessing the main BWI server without a
-password.  This is intended for use of the local ``bwilab`` account on
-each robot.  For that account, **do not** supply a passphrase.
-
-Example
-'''''''
-
-::
-    $ rosrun bwilab_scripts keygen
-
-distance_traveled
------------------
-
-Prints the time comsumed and distance traveled for one or more ROS bag
-files listed on the command line. Invalid files, or names not ending
-in ".bag" are reported as having zero duration and zero distance.
-
-Usage
-'''''
-
-::
-    rosrun bwilab_scripts distance_traveled bag1 [bag2 ...]
-
-Example
-'''''''
-
-::
-    $ rosrun bwilab_scripts distance_traveled bwi_2016-01-06-11-13-34.bag  
-      time: 2:04:08  distance: 2999.99  filename: bwi_2016-01-06-11-13-34.bag
 
 upload
 ------
@@ -84,18 +36,16 @@ Usage
 
 To upload and then delete all new bag files for the current user::
 
-    cd ~/.ros/bwi/bwilab_scripts
-    rosrun bwilab_scripts upload
+    cd ~/.ros/bwi/bwi_logging
+    bwilab upload
 
 To upload and keep any new bag files in the current directory::
 
-    rosrun bwilab_scripts upload -k
+    bwilab upload -k
 
 To force a specific host name::
 
-    HOSTNAME=bender rosrun bwilab_scripts upload
-
+    HOSTNAME=bender bwilab upload
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/
 .. _ROS: http:/ros.org
-.. _`rosbag`: http://wiki.ros.org/rosbag
