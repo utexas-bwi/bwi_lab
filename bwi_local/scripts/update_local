@@ -1,0 +1,17 @@
+#!/bin/bash
+
+## Update /usr/local with installed files from build
+
+if [ "$#" -lt "1" ]
+then    echo "usage: `basename $0` INSTALL-SPACE"
+        echo ""
+        echo "Update /usr/local with files from the designated" 
+        echo "install space. Run under the \"bwilab\" account."
+        exit 1
+fi
+
+## TODO: find a better tree copy command that does not try to set
+## directory permissions. This works, but prints bogus error messages.
+cd $1
+find bin lib share | cpio -pvud /usr/local
+exit $?

@@ -21,6 +21,7 @@ catkin_install_python(PROGRAMS ${${PROJECT_NAME}_PY_SCRIPTS}
 install(PROGRAMS
           scripts/clone_server
           scripts/keygen
+          scripts/update_local
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############

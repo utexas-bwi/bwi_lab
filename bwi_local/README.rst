@@ -78,6 +78,18 @@ Example
     $ bwi distance_traveled bwi_2016-01-06-11-13-34.bag
       time: 2:04:08  distance: 2999.99  filename: bwi_2016-01-06-11-13-34.bag
 
+update_local
+------------
+
+Update ``/usr/local`` with files from the designated install
+space. Run this under the ``bwilab`` account.
+
+Usage
+'''''
+
+::
+    bwi update_local ~/ws/install
+
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/
 .. _ROS: http:/ros.org
