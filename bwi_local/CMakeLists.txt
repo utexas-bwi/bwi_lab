@@ -2,10 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(bwi_local)
 
 find_package(catkin REQUIRED COMPONENTS roslint)
-find_package(Boost REQUIRED COMPONENTS filesystem system)
-
 catkin_package()
-
 catkin_python_setup()
 
 #############
@@ -15,7 +12,7 @@ catkin_python_setup()
 # NOTE: the "bwi" executable is installed directly in /usr/local/bin,
 # and not in the usual ${CATKIN_PACKAGE_BIN_DESTINATION}.
 install(PROGRAMS scripts/bwi
-        RUNTIME DESTINATION bin)
+        DESTINATION bin)
 
 set(${PROJECT_NAME}_PY_SCRIPTS scripts/distance_traveled)
 catkin_install_python(PROGRAMS ${${PROJECT_NAME}_PY_SCRIPTS}

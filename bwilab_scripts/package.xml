@@ -4,6 +4,8 @@
   <name>bwilab_scripts</name>
   <version>0.0.0</version>
   <description>
+    Privileged BWI lab administration scripts.
+
     These are privileged administration scripts and programs are used
     by the Building-Wide Intelligence project of the University of
     Texas at Austin.  They are used to share information between

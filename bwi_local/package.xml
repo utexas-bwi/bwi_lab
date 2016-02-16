@@ -4,6 +4,8 @@
   <name>bwi_local</name>
   <version>0.0.0</version>
   <description>
+    BWI lab administration scripts.
+
     These administration scripts and programs are used by the
     Building-Wide Intelligence project of the University of Texas at
     Austin.  They are used to share information between various robots
