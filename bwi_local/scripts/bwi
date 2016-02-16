@@ -11,6 +11,4 @@ CMD_DIR="/usr/local/lib/bwi_local"
 
 cmd=$1
 shift
-shift
-echo $CMD_DIR/$cmd $*
 exec $CMD_DIR/$cmd $*
