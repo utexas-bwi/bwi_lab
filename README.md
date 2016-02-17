@@ -1,10 +1,20 @@
-bwi_lab
-=======
+Overview
+========
 
-Administration scripts and other programs for managing the systems and
-networks for the
+This repository contains administration scripts and other programs for
+managing the systems and networks for the
 [Building-Wide Intelligence lab](http://www.cs.utexas.edu/~larg/bwi_web/)
 of the University of Texas at Austin.
+
+There are two catkin packages here:
+
+ * [bwilab_scripts](https://github.com/utexas-bwi/bwi_lab/tree/master/bwilab_scripts)
+   provides a carefully constrained ability to run a script under the
+   ``bwilab`` user account.
+
+ * [bwi_local](https://github.com/utexas-bwi/bwi_lab/tree/master/bwi_local)
+   contains other administration scripts that depend upon the user's
+   authorization.
 
 Build
 =====
@@ -24,17 +34,21 @@ repository, and build it.
 Install
 =======
 
-Authorize ``bwilab`` group to update some selected ``/usr/local``
-directories:
-
+Source the newly-created install workspace, providing access to some
+scripts that are useful for completing the installation.
 ```
- $ cd /usr/local
- $ sudo chmod g+w bin lib lib/python2.7/dist-packages share
- $ sudo chgrp bwilab bin lib lib/python2.7/dist-packages share
+ $ source install/setup.bash
 ```
 
-Copy the built install directory into ``/usr/local``:
+Authorize ``bwilab`` group to update some selected parts of
+``/usr/local``:
 
 ```
- $ find bin/ lib/ share/ | cpio -pvud /usr/local
+ $ rosrun bwi_local authorize_local
+```
+
+Copy the built install space into ``/usr/local``:
+
+```
+ $ rosrun bwi_local update_local
 ```

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+## Authorize bwilab account to install in selected parts of /usr/local
+
+if [ "$#" -gt "0" ]
+then    echo "usage: `basename $0`"
+        echo ""
+        echo "Modify certain directories within /usr/local so the \"bwilab\"" 
+        echo "user can install things there."
+        echo
+        echo "NOTE: you MUST use sudo to run this command."
+        exit 1
+fi
+
+# These directories allow bwilab to install things:
+DIRS="bin lib lib/python2.7/dist-packages share"
+
+cd /usr/local
+/bin/chmod g+w $DIRS
+/bin/chgrp bwilab $DIRS
+exit $?

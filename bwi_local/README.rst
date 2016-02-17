@@ -11,12 +11,29 @@ permissions, and hence no new security requirements.
 Scripts
 =======
 
+authorize_local
+---------------
+
+Modify certain directories within ``/usr/local`` so the ``bwilab``
+user can install things there.
+
+**Note**: you *must* use sudo to run this command.
+
+Example
+'''''''
+
+::
+    $ sudo bwi authorize_local
+
 bwi
 ---
 
 Run any script installed in the ``/usr/local/lib/bwi_local`` directory
 within the current user environment.  No additional permissions are
-requested or required.
+requested or required.  This script is installed in
+``/usr/local/bin``, which is generally included in every user's
+command ``$PATH``, so it can run the other scripts with or without a
+ROS environment.
 
 Usage
 '''''
@@ -82,7 +99,11 @@ update_local
 ------------
 
 Update ``/usr/local`` with files from the designated install
-space. Run this under the ``bwilab`` account.
+space.
+
+Run this under the ``bwilab`` account, which should first have been
+given access via the ``authorize`` script.
+
 
 Usage
 '''''
