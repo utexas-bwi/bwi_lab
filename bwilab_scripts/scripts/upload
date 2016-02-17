@@ -2,110 +2,65 @@
 
 ## Upload saved bag files from the current directory.
 
-if [ "$#" -gt "2" ] || [ "$1" = "-h" ]
+if [ "$#" -gt "2" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then    echo "usage: $(basename $0) [option]"
         echo ""
         echo "Uploads files matching 'bwi_*.bag' from the current directory to the"
         echo "main BWI server. \$HOSTNAME should be the lowest-level domain name."
+        echo "By default, will delete the files after uploading"
         echo ""
-        echo "Supports at most one of these options:"
-        echo -e "\t-d\tdelete files uploaded successfully (default)"
-        echo -e "\t-h\tprint this help message"
-        echo -e "\t-k\tkeep uploaded files"
-        echo ""
-        echo "Additionally, supports uploading of extra experimental bags matching"
-        echo "extra_*.bag with at most one the following options"
-        echo -e "\t--extra\t\talso upload extra bags"
-        echo -e "\t--extra-only\tonly upload extra bags"
+        echo "Supports these options:"
+        echo -e "\t-h [--help]\tprint this help message"
+        echo -e "\t-p\tspecify the bag prefix (will upload nodes matching 'PREFIX_*.bag'"
+        echo -e "\t-e\tkeep the files after uploading"
         exit 1
 fi
 
 # Default operations
 del_opt="--remove-sent-files"
-extra_opt="NO"
+prefix="bwi"
 
-for i in "$@"
-do
-  case $i in
-    -d)
-      del_opt="--remove-sent-files"
-      ;;
-    -k)
-      del_opt=""
-      ;;
-    --extra)
-      extra_opt="YES"
-      ;;
-    --extra-only)
-      extra_opt="ONLY"
-      ;;
-    *)
-      echo "Unrecognized option"
-      exit -1
-      ;;
-  esac
+# Get parameters
+while getopts 'k:p:' opt; do
+    case $opt in
+        p)  prefix="$OPTARG" ;;
+        k)  del_opt=""       ;;
+        *)  exit 1           ;;
+    esac
 done
 
+suffix="_*.bag"
+glob=$prefix$suffix
+
+# Ensure the hostname is set
 if [ "$HOSTNAME" == "" ]
 then    echo "$HOSTNAME must be set for this operation"
         exit 9
-fi
-
-if [ "$extra_opt" == "YES" ] || [ "$extra_opt" == "ONLY" ]
-then
-  if ! ls extra_*.bag 1> /dev/null 2>&1
-  then    echo "No experimental new bag files (matching extra_*.bag) here to upload."
-    exit 0
-  fi
-fi
-
-# See if there are standard bags to upload
-if ! ls bwi_*.bag 1> /dev/null 2>&1
-then    echo "No new bag files (matching bwi_*.bag) here to upload."
-        exit 0
 fi
 
 # Make a subdirectory for the compressed files.
 COMPRESSED="compressed"
 mkdir -p $COMPRESSED
 
+# Commands
 RSYNC=/usr/bin/rsync
 SERVER=nixons-head.csres.utexas.edu
 TARGET_DIR=~bwilab/robot/$HOSTNAME
 
+# See if there are bags to upload
+if ! ls $glob 1> /dev/null 2>&1
+then    echo "No new bag files (matching $glob) here to upload."
+  exit 0
+fi
+
 # Make sure the target directory exists:
 ssh -p40 $SERVER mkdir -p $TARGET_DIR
-# Compress the normal data (as long as its not only experimental)
-if [ "$extra_opt" != "ONLY" ]
-then
-  rosbag compress --output-dir=$COMPRESSED bwi_*.bag
-  rm -f bwi_*.bag
-fi
 
-# Compress the experimental data if required
-if [ "$extra_opt" == "YES" ] || [ "$extra_opt" == "ONLY" ]
-then
-  rosbag compress --output-dir=$COMPRESSED extra_*.bag
-  rm -f extra_*.bag
-fi
+# Compress the data
+rosbag compress --output-dir=$COMPRESSED $glob
+rm -f bwi_*.bag
+
+# Upload the data
 cd $COMPRESSED || exit -1
-
-if [ "$extra_opt" == "YES" ]
-then
-  # copy normal data
-  echo $RSYNC -avz $del_opt -e 'ssh -p40' bwi_*.bag $SERVER:$TARGET_DIR
-  #exec $RSYNC -avz $del_opt -e 'ssh -p40' bwi_*.bag $SERVER:$TARGET_DIR
-  # copy experimental data
-  echo $RSYNC -avz $del_opt -e 'ssh -p40' extra_*.bag $SERVER:$TARGET_DIR
-  #exec $RSYNC -avz $del_opt -e 'ssh -p40' extra_*.bag $SERVER:$TARGET_DIR
-elif [ "$extra_opt" == "ONLY" ]
-then
-  # copy experimental data
-  echo $RSYNC -avz $del_opt -e 'ssh -p40' extra_*.bag $SERVER:$TARGET_DIR
-  #exec $RSYNC -avz $del_opt -e 'ssh -p40' extra_*.bag $SERVER:$TARGET_DIR
-else
-  # copy normal data
-  echo $RSYNC -avz $del_opt -e 'ssh -p40' bwi_*.bag $SERVER:$TARGET_DIR
-  #exec $RSYNC -avz $del_opt -e 'ssh -p40' bwi_*.bag $SERVER:$TARGET_DIR
-fi
-
+echo $RSYNC -avz $del_opt -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
+exec $RSYNC -avz $del_opt -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
