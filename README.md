@@ -36,19 +36,39 @@ Install
 
 Source the newly-created install workspace, providing access to some
 scripts that are useful for completing the installation.
+
 ```
  $ source install/setup.bash
 ```
 
-Authorize ``bwilab`` group to update some selected parts of
-``/usr/local``:
+If not already done on this system, authorize ``bwilab`` to update
+some selected parts of ``/usr/local``:
 
 ```
- $ rosrun bwi_local authorize_local
+ $ sudo install/lib/bwi_local/authorize_local
 ```
 
 Copy the built install space into ``/usr/local``:
 
 ```
- $ rosrun bwi_local update_local
+ $ rosrun bwi_local update_local install
+```
+
+Configure
+=========
+
+If not already done on this system, create ssh keys so the ``bwilab``
+user can run selected commands on the BWI server:
+
+```
+ $ bwi keygen
+
+```
+
+That must be done under the ``bwilab`` user account.  You can do it
+using ``su``, if logged in as a different user:
+
+```
+ $ su bwilab -c bwi keygen
+
 ```
