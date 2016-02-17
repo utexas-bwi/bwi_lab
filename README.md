@@ -65,10 +65,4 @@ user can run selected commands on the BWI server:
 
 ```
 
-That must be done under the ``bwilab`` user account.  You can do it
-using ``su``, if logged in as a different user:
-
-```
- $ su bwilab -c 'bwi keygen'
-
-```
+Be sure to do that under the ``bwilab`` user account.
