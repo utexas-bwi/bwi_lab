@@ -69,6 +69,6 @@ That must be done under the ``bwilab`` user account.  You can do it
 using ``su``, if logged in as a different user:
 
 ```
- $ su bwilab -c bwi keygen
+ $ su bwilab -c 'bwi keygen'
 
 ```

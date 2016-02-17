@@ -16,5 +16,5 @@ KEYFILE=~/.ssh/id_rsa
 if /usr/bin/ssh-keygen -q -t rsa -f $KEYFILE
 then    cat $KEYFILE.pub | ssh -p40 $SERVER "cat >>  ~/.ssh/authorized_keys"
 else    echo 'ssh key generation failed'
-        return 9
+        exit 9
 fi
