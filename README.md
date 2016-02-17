@@ -15,9 +15,7 @@ repository, and build it.
 ```
  $ mkdir -p ~/ws/src
  $ cd ~/ws/src
- $ wstool init
- $ wstool set bwi_local --git https://github.com/utexas-bwi/bwi_lab.git
- $ wstool up
+ $ git clone https://github.com/utexas-bwi/bwi_lab.git
  $ cd ..
  $ catkin config --extend /opt/ros/indigo --install
  $ catkin build
