@@ -1,0 +1,63 @@
+#!/bin/bash
+
+## Compress saved bag files, preparing to upload.
+
+DEFAULT_DIR=~/.ros/bwi/bwi_logging
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then    echo "usage: $(basename $0) [options]"
+        echo ""
+        echo "Compress bag files for uploading to the main BWI server."
+        echo "The compressed bags are stored in a subdirectory named"
+        echo "'compressed', and the uncompressed files deleted."
+        echo ""
+        echo "Options:"
+        echo -e "\t-d\tdirectory containing bags (default: $DEFAULT_DIR)"
+        echo -e "\t-h [--help]\tprint this message"
+        echo -e "\t-n\tdry run, do nothing"
+        echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
+        exit 2
+fi
+
+# Default options
+dir=$DEFAULT_DIR
+dry_run=false
+prefix="bwi"
+
+# Get parameters
+while getopts 'd:np:' opt; do
+    case $opt in
+        d)  dir="$OPTARG"    ;;
+        n)  dry_run=true     ;;
+        p)  prefix="$OPTARG" ;;
+        *)  exit 9           ;;
+    esac
+done
+
+suffix="_*.bag"
+glob=$prefix$suffix
+
+echo "compressing the bag files in $dir"
+cd $dir
+
+# Make a subdirectory for the compressed files.
+COMPRESSED="compressed"
+mkdir -p $COMPRESSED
+
+# See if there are bags to compress
+if ! ls $glob 1> /dev/null 2>&1
+then    echo "No new files matching $glob found."
+        exit 1
+fi
+
+if $dry_run
+then    echo rosbag compress --output-dir=$COMPRESSED $glob
+        exit 0
+fi
+
+# Compress the bags
+if rosbag compress --output-dir=$COMPRESSED $glob
+then    /bin/rm -f $glob
+fi
+
+exit $?

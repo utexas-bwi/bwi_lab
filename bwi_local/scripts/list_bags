@@ -1,0 +1,5 @@
+#!/bin/bash
+
+## List bag files saved in BWI logging directories.
+
+exec /bin/ls -lh /home/users/*/.ros/bwi/bwi_logging

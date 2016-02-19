@@ -21,9 +21,29 @@ user can install things there.
 
 Example
 '''''''
-
 ::
+
     $ sudo bwi authorize_local
+
+bags
+----
+
+Compress bag files for uploading to the main BWI server.  The
+compressed bags are stored in a subdirectory named ``compressed``, and
+the uncompressed files deleted.
+
+Usage
+'''''
+::
+
+    $ bwi bags [options]
+
+Options:
+
+ * -d directory containing bags (default: ``~/.ros/bwi/bwi_logging``)
+ * -h [--help] print help message
+ * -n dry run, do nothing
+ * -p file name prefix, handle files matching ``PREFIX_*.bag``.
 
 bwi
 ---
@@ -37,8 +57,8 @@ ROS environment.
 
 Usage
 '''''
-
 ::
+
     bwi script_name [ args ]
 
 clone_server
@@ -61,6 +81,26 @@ the script::
 This creates a ``~/logs/robot`` directory containing subdirectories
 named after each robot, which contain the bags for each robot.
 
+distance_traveled
+-----------------
+
+Prints the time comsumed and distance traveled for one or more ROS bag
+files listed on the command line. Invalid files, or names not ending
+in ".bag" are reported as having zero duration and zero distance.
+
+Usage
+'''''
+::
+
+    bwi distance_traveled bag1 [bag2 ...]
+
+Example
+'''''''
+::
+
+    $ bwi distance_traveled bwi_2016-01-06-11-13-34.bag
+      time: 2:04:08  distance: 2999.99  filename: bwi_2016-01-06-11-13-34.bag
+
 keygen
 ------
 
@@ -71,29 +111,20 @@ requested.
 
 Example
 '''''''
-
 ::
+
     $ bwi keygen
 
-distance_traveled
------------------
+list_bags
+'''''''''
 
-Prints the time comsumed and distance traveled for one or more ROS bag
-files listed on the command line. Invalid files, or names not ending
-in ".bag" are reported as having zero duration and zero distance.
+List bag files saved in BWI logging directories.
 
 Usage
 '''''
-
 ::
-    bwi distance_traveled bag1 [bag2 ...]
 
-Example
-'''''''
-
-::
-    $ bwi distance_traveled bwi_2016-01-06-11-13-34.bag
-      time: 2:04:08  distance: 2999.99  filename: bwi_2016-01-06-11-13-34.bag
+    bwi list_bags
 
 update_local
 ------------
@@ -107,8 +138,8 @@ given access via the ``authorize`` script.
 
 Usage
 '''''
-
 ::
+
     bwi update_local ~/ws/install
 
 
