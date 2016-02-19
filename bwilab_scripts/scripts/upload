@@ -2,56 +2,65 @@
 
 ## Upload saved bag files from the current directory.
 
-if [ "$#" -gt "1" -o "$1" = "-h" ]
-then    echo "usage: `basename $0` [option]"
+if [ "$#" -gt "2" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then    echo "usage: $(basename $0) [option]"
         echo ""
         echo "Uploads files matching 'bwi_*.bag' from the current directory to the"
         echo "main BWI server. \$HOSTNAME should be the lowest-level domain name."
+        echo "By default, will delete the files after uploading"
         echo ""
-        echo "Supports at most one of these options:"
-        echo -e "\t-d\tdelete files uploaded successfully (default)"
-        echo -e "\t-h\tprint this help message"
-        echo -e "\t-k\tkeep uploaded files"
+        echo "Supports these options:"
+        echo -e "\t-h [--help]\tprint this help message"
+        echo -e "\t-p\tspecify the bag prefix (will upload nodes matching 'PREFIX_*.bag'"
+        echo -e "\t-k\tkeep the files after uploading"
         exit 1
 fi
-del_opt=${1:-"-d"}
-if [ "$del_opt" = "-d" ]
-then    del_opt="--remove-sent-files"
-else
-        if [ "$del_opt" = "-k" ]
-        then    del_opt=""
-        else    echo "invalid parameter: $del_opt (try -h for help)"
-                exit 2
-        fi
-fi
 
+# Default operations
+del_opt="--remove-sent-files"
+prefix="bwi"
+
+# Get parameters
+while getopts 'k:p:' opt; do
+    case $opt in
+        p)  prefix="$OPTARG" ;;
+        k)  del_opt=""       ;;
+        *)  exit 1           ;;
+    esac
+done
+
+suffix="_*.bag"
+glob=$prefix$suffix
+
+# Ensure the hostname is set
 if [ "$HOSTNAME" == "" ]
 then    echo '$HOSTNAME must be set for this operation'
         exit 9
-fi
-
-# See if there is anything to do.
-if ! ls bwi_*.bag 1> /dev/null 2>&1
-then    echo "No new bag files here to upload."
-        exit 0
 fi
 
 # Make a subdirectory for the compressed files.
 COMPRESSED="compressed"
 mkdir -p $COMPRESSED
 
-# Compress the data, then remove the uncompressed copies.
-rosbag compress --output-dir=$COMPRESSED bwi_*.bag
-rm -f bwi_*.bag
-
+# Commands
 RSYNC=/usr/bin/rsync
 SERVER=nixons-head.csres.utexas.edu
 TARGET_DIR=~bwilab/robot/$HOSTNAME
 
+# See if there are bags to upload
+if ! ls $glob 1> /dev/null 2>&1
+then    echo "No new bag files (matching $glob) here to upload."
+  exit 0
+fi
+
 # Make sure the target directory exists:
 ssh -p40 $SERVER mkdir -p $TARGET_DIR
 
-# Copy compressed files to the server
-cd $COMPRESSED
-echo $RSYNC -avz $del_opt -e 'ssh -p40' bwi_*.bag $SERVER:$TARGET_DIR
-exec $RSYNC -avz $del_opt -e 'ssh -p40' bwi_*.bag $SERVER:$TARGET_DIR
+# Compress the data
+rosbag compress --output-dir=$COMPRESSED $glob
+rm -f $glob
+
+# Upload the data
+cd $COMPRESSED || exit -1
+echo $RSYNC -avz $del_opt -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
+exec $RSYNC -avz $del_opt -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
