@@ -12,7 +12,7 @@ then    echo "usage: $(basename $0) [option]"
         echo "Supports these options:"
         echo -e "\t-h [--help]\tprint this help message"
         echo -e "\t-p\tspecify the bag prefix (will upload nodes matching 'PREFIX_*.bag'"
-        echo -e "\t-e\tkeep the files after uploading"
+        echo -e "\t-k\tkeep the files after uploading"
         exit 1
 fi
 
@@ -34,7 +34,7 @@ glob=$prefix$suffix
 
 # Ensure the hostname is set
 if [ "$HOSTNAME" == "" ]
-then    echo "$HOSTNAME must be set for this operation"
+then    echo '$HOSTNAME must be set for this operation'
         exit 9
 fi
 
@@ -58,7 +58,7 @@ ssh -p40 $SERVER mkdir -p $TARGET_DIR
 
 # Compress the data
 rosbag compress --output-dir=$COMPRESSED $glob
-rm -f bwi_*.bag
+rm -f $glob
 
 # Upload the data
 cd $COMPRESSED || exit -1
