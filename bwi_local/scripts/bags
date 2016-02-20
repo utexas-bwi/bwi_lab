@@ -51,7 +51,7 @@ then    echo "No new files matching $glob found."
 fi
 
 if $dry_run
-then    echo rosbag compress --output-dir=$COMPRESSED $glob
+then    rosbag info $glob
         exit 0
 fi
 
