@@ -16,6 +16,7 @@ then    echo "usage: $(basename $0) [options]"
         echo -e "\t-h [--help]\tprint this message"
         echo -e "\t-n\tdry run, do nothing"
         echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
+        echo -e "\t  \t(default is ``bwi``)
         exit 2
 fi
 

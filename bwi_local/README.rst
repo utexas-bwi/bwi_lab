@@ -38,12 +38,13 @@ Usage
 
     $ bwi bags [options]
 
-Options:
+Options::
 
- * -d directory containing bags (default: ``~/.ros/bwi/bwi_logging``)
- * -h [--help] print help message
- * -n dry run, do nothing
- * -p file name prefix, handle files matching ``PREFIX_*.bag``.
+    -d  directory containing bags (default: ``~/.ros/bwi/bwi_logging``)
+    -h [--help]  print help message
+    -n  dry run, do nothing
+    -p  file name prefix, handle files matching ``PREFIX_*.bag``.
+        (default is ``bwi``)
 
 bwi
 ---

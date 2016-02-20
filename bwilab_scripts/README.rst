@@ -16,27 +16,31 @@ Scripts
 upload
 ------
 
-Copies any newly-saved bag files in the current directory to the lab
+Uploads files from the current directory to the main BWI lab server.
+Copies any newly-saved bag files in the current directory to the
 server, optionally deleting the local copy afterwards. Only files with
-names starting with ``bwi_`` and ending with ``.bag`` will be copied.
+names matching a specified prefix and ending with ``.bag`` will be
+copied.
 
 Files are stored in the ``~bwilab/robot/$HOSTNAME`` directory on the
 server, and ``$HOSTNAME`` should be set to the part of the full domain
 name preceding the first dot.  Files already present on the server are
 neither sent or deleted.
 
-You may specify at most one of these options::
+Options::
 
-    -d  delete files uploaded successfully (default)
     -h  print a help message
     -k  keep uploaded files
+    -n  dry run, do nothing
+    -p  file name prefix, handle files matching ``PREFIX_*.bag``
+        (default is ``bwi``)
 
 Usage
 '''''
 
-To upload and then delete all new bag files for the current user::
+To upload and then delete all compressed bag files for the current user::
 
-    cd ~/.ros/bwi/bwi_logging
+    cd ~/.ros/bwi/bwi_logging/compressed
     bwilab upload
 
 To upload and keep any new bag files in the current directory::

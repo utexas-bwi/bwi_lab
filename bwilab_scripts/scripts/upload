@@ -5,15 +5,16 @@
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then    echo "usage: $(basename $0) [option]"
         echo ""
-        echo "Uploads files from the current directory to the main BWI "
+        echo "Uploads files from the current directory to the main BWI"
         echo "server. \$HOSTNAME should be the lowest-level domain name."
         echo "By default, delete the files successfully uploaded"
         echo ""
         echo "Supports these options:"
         echo -e "\t-h [--help]\tprint this help message"
-        echo -e "\t-n\tdry run, do nothing"
-        echo -e "\t-p\tspecify the bag prefix (will upload nodes matching 'PREFIX_*.bag'"
         echo -e "\t-k\tkeep the files after uploading"
+        echo -e "\t-n\tdry run, do nothing"
+        echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
+        echo -e "\t  \t(default is ``bwi``)
         exit 1
 fi
 
