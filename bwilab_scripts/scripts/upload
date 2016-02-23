@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 ## Upload saved bag files from the current directory.
+#
+#  MUST run using /bin/sh, because bash defeats the setuid authorization.
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then    echo "usage: $(basename $0) [option]"
@@ -37,9 +39,8 @@ suffix="_*.bag"
 glob=$prefix$suffix
 
 # Ensure the hostname is set
-if [ "$HOSTNAME" == "" ]
-then    echo '$HOSTNAME must be set for this operation'
-        exit 9
+if [ "$HOSTNAME" = "" ]
+then    HOSTNAME=$(hostname)
 fi
 
 # Constants
@@ -48,7 +49,7 @@ SERVER=nixons-head.csres.utexas.edu
 TARGET_DIR=~bwilab/robot/$HOSTNAME
 
 # See if there are bags to upload
-if ! ls $glob 1> /dev/null 2>&1
+if ! /bin/ls $glob 1> /dev/null 2>&1
 then    echo "No files matching $glob found."
         exit 1
 fi

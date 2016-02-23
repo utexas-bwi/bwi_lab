@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   //           << ", effective UID: " << geteuid() << std::endl;
 
   std::string resolved_cmd_path = CMD_DIR + '/' + argv[1];
-  std::cout << "Command path: " << resolved_cmd_path << std::endl;
+  // std::cout << "Command path: " << resolved_cmd_path << std::endl;
 
   // execute the desired program using the current environment
   int rc = execv(resolved_cmd_path.c_str(), argv+1);
