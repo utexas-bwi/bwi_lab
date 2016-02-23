@@ -61,14 +61,20 @@ int main(int argc, char *argv[])
       return 9;
     }
 
-  // std::cout << "Real UID: " << getuid()
-  //           << ", effective UID: " << geteuid() << std::endl;
+  // Set the real UID to match the effective UID coming from the
+  // setuid executable.
+  uid_t effective_uid = geteuid();
+  int rc = setreuid(effective_uid, -1);
+  if (rc != 0)
+    {
+      perror("error: setreuid() failed");
+      return 2;
+    }
 
   std::string resolved_cmd_path = CMD_DIR + '/' + argv[1];
-  // std::cout << "Command path: " << resolved_cmd_path << std::endl;
 
-  // execute the desired program using the current environment
-  int rc = execv(resolved_cmd_path.c_str(), argv+1);
+  // Execute the desired program using the current environment.
+  rc = execv(resolved_cmd_path.c_str(), argv+1);
   // execv SHOULD NOT return
 
   std::string error_str = "error: exec " + resolved_cmd_path + " failed";
