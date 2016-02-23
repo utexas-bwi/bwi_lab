@@ -8,7 +8,14 @@ then    echo "usage: `basename $0` command [args]"
 fi
 
 CMD_DIR="/usr/local/lib/bwi_local"
-
 cmd=$1
+
+# issue sensible error message if command invalid
+if [ ! -x "$CMD_DIR/$cmd" ]
+then    echo "$(basename $0): \"$cmd\" command not found."
+        exit 2
+fi
+
+# run the command with any remaining arguments
 shift
 exec $CMD_DIR/$cmd $*
