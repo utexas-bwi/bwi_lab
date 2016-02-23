@@ -1,36 +1,45 @@
 #!/bin/bash
 
-## Compress saved bag files, preparing to upload.
+## Compress and upload bag files for BWI log data.
 
 DEFAULT_DIR=~/.ros/bwi/bwi_logging
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then    echo "usage: $(basename $0) [options]"
         echo ""
-        echo "Compress bag files for uploading to the main BWI server."
+        echo "Compress and upload bag files to the main BWI server."
         echo "The compressed bags are stored in a subdirectory named"
         echo "'compressed', and the uncompressed files deleted."
         echo ""
         echo "Options:"
+        echo -e "\t-c\tcompress only, do not upload"
         echo -e "\t-d\tdirectory containing bags (default: $DEFAULT_DIR)"
-        echo -e "\t-h [--help]\tprint this message"
+        echo -e "\t-h\t[--help] print this message"
+        echo -e "\t-k\tkeep the compressed files after uploading"
         echo -e "\t-n\tdry run, do nothing"
         echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
-        echo -e "\t  \t(default is ``bwi``)"
+        echo -e "\t  \t(default is 'bwi')"
+        echo -e "\t-u\tupload only, do not compress"
         exit 2
 fi
 
 # Default options
+compress=true
+del_opt=""
 dir=$DEFAULT_DIR
 dry_run=false
 prefix="bwi"
+upload=true
 
 # Get parameters
-while getopts 'd:np:' opt; do
+while getopts 'd:knp:' opt; do
     case $opt in
+        c)  upload=false     ;;
         d)  dir="$OPTARG"    ;;
+        k)  del_opt="-k"     ;;
         n)  dry_run=true     ;;
         p)  prefix="$OPTARG" ;;
+        u)  compress=false   ;;
         *)  exit 9           ;;
     esac
 done
@@ -38,27 +47,45 @@ done
 suffix="_*.bag"
 glob=$prefix$suffix
 
-echo "compressing the bag files in $dir"
+echo "Processing bag files in $dir."
 cd $dir
 
 # Make a subdirectory for the compressed files.
 COMPRESSED="compressed"
 mkdir -p $COMPRESSED
 
-# See if there are bags to compress
-if ! ls $glob 1> /dev/null 2>&1
-then    echo "No new files matching $glob found."
-        exit 1
+if $compress
+then
+        # See if there are bags to compress
+        if /bin/ls $glob 1> /dev/null 2>&1
+        then
+                # make sure rosbag command is accessible via some ROS environment
+                if ! $(which rosbag)
+                then    source /opt/ros/indigo/setup.bash
+                fi
+
+                if $dry_run
+                then    rosbag info $glob
+                        # no upload done with -n
+                        exit 0
+                fi
+
+                # Compress the bags
+                if rosbag compress --output-dir=$COMPRESSED $glob
+                then    /bin/rm -f $glob
+                fi
+                if [ $? != 0 ]
+                then    exit $?
+                fi
+        else    echo "No new uncompressed files matching $glob found."
+        fi
 fi
 
-if $dry_run
-then    rosbag info $glob
-        exit 0
-fi
-
-# Compress the bags
-if rosbag compress --output-dir=$COMPRESSED $glob
-then    /bin/rm -f $glob
+if $upload
+then    # upload any compressed bags
+        cd $COMPRESSED
+        exec bwilab upload -p $prefix $del_opt
+        # should NOT return
 fi
 
 exit $?
