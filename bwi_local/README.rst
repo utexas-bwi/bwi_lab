@@ -28,9 +28,10 @@ Example
 bags
 ----
 
-Compress bag files for uploading to the main BWI server.  The
-compressed bags are stored in a subdirectory named ``compressed``, and
-the uncompressed files deleted.
+Compress and upload bag files to the main BWI server.  The bags are
+normally stored in ``~/.ros/bwi/bwi_logging`` for the current user.
+The compressed bags are stored in a subdirectory named ``compressed``,
+and the uncompressed files deleted.
 
 Usage
 '''''
@@ -40,11 +41,13 @@ Usage
 
 Options::
 
-    -d  directory containing bags (default: ``~/.ros/bwi/bwi_logging``)
-    -h [--help]  print help message
+    -c  compress only, do not upload
+    -d  directory containing bags (default: "~/.ros/bwi/bwi_logging")
+    -h  [--help] print help message
     -n  dry run, do nothing
-    -p  file name prefix, handle files matching ``PREFIX_*.bag``.
-        (default is ``bwi``)
+    -p  file name prefix, handle files matching "PREFIX_*.bag".
+        (default is "bwi")
+    -u  upload only, do not compress
 
 bwi
 ---
