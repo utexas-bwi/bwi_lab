@@ -51,5 +51,8 @@ then    echo "No files matching $glob found."
         exit 1
 fi
 
+# Make sure the target directory exists:
+/usr/bin/ssh -p40 $SERVER mkdir -p $TARGET_DIR
+
 # Upload the data
 exec $RSYNC -avz $dry_run -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
