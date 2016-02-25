@@ -84,11 +84,12 @@ fi
 if $upload
 then    # upload any compressed bags
         cd $COMPRESSED
-        bwilab upload -p $prefix
-        if $? = 0 && $keep_opt
-        then    mkdir -p ../kept
-                /bin/mv $glob ../kept
-        else    /bin/rm $glob
+        if bwilab upload -p $prefix
+        then    if $keep_opt
+                then    mkdir -p ../kept
+                        /bin/mv $glob ../kept
+                else    /bin/rm $glob
+                fi
         fi
 fi
 
