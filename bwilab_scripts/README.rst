@@ -17,15 +17,18 @@ upload
 ------
 
 Uploads files from the current directory to the main BWI lab server.
-Copies any newly-saved bag files in the current directory to the
-server, optionally deleting the local copy afterwards. Only files with
-names matching a specified prefix and ending with ``.bag`` will be
-copied.
 
-Files are stored in the ``~bwilab/robot/$HOSTNAME`` directory on the
-server, and ``$HOSTNAME`` should be set to the part of the full domain
-name preceding the first dot.  Files already present on the server are
-neither sent or deleted.
+*This script is not normally run directly*.  Use the ``bags``
+script from `bwi_local`_, instead.
+
+The upload copies any new compressed bag files in the current
+directory to the server.  Only files with names matching a specified
+prefix and ending with ``.bag`` will be copied.
+
+Files on the server are stored in the ``~bwilab/robot/$HOSTNAME``
+directory.  ``$HOSTNAME`` should be set to the robot's name; if not
+defined, the output of the ``hostname`` command is used.  Files
+already on the server will not be sent again.
 
 Options::
 
@@ -37,18 +40,15 @@ Options::
 Usage
 '''''
 
-To upload and then delete all compressed bag files for the current user::
+To upload compressed bag files for the current user::
 
     cd ~/.ros/bwi/bwi_logging/compressed
     bwilab upload
-
-To upload and keep any new bag files in the current directory::
-
-    bwilab upload -k
 
 To force a specific host name::
 
     HOSTNAME=bender bwilab upload
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/
+.. _`bwi_local`: https://github.com/utexas-bwi/bwi_lab/tree/master/bwi_local
 .. _ROS: http:/ros.org
