@@ -25,7 +25,7 @@ fi
 
 # Default options
 compress=true
-keep_opt="true"
+keep_opt="false"
 dir=$DEFAULT_DIR
 dry_run=false
 prefix="bwi"
@@ -36,7 +36,7 @@ while getopts 'd:knp:' opt; do
     case $opt in
         c)  upload=false     ;;
         d)  dir="$OPTARG"    ;;
-        k)  keep_opt="false"  ;;
+        k)  keep_opt="true"  ;;
         n)  dry_run=true     ;;
         p)  prefix="$OPTARG" ;;
         u)  compress=false   ;;
