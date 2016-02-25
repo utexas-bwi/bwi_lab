@@ -47,7 +47,7 @@ Options::
     -d  directory containing bags (default: "~/.ros/bwi/bwi_logging")
     -h  [--help] print help message
     -k  keep the compressed files after uploading"
-    -n  dry run, do nothing
+    -n  dry run, only prints bag info for the selected files
     -p  file name prefix, handle files matching "PREFIX_*.bag".
         (default is "bwi")
     -u  upload only, do not compress
