@@ -30,7 +30,6 @@ neither sent or deleted.
 Options::
 
     -h  print a help message
-    -k  keep uploaded files
     -n  dry run, do nothing
     -p  file name prefix, handle files matching ``PREFIX_*.bag``
         (default is ``bwi``)

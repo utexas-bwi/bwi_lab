@@ -13,7 +13,6 @@ then    echo "usage: $(basename $0) [option]"
         echo ""
         echo "Supports these options:"
         echo -e "\t-h [--help]\tprint this help message"
-        echo -e "\t-k\tkeep the files after uploading"
         echo -e "\t-n\tdry run, do nothing"
         echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
         echo -e "\t  \t(default is ``bwi``)"
@@ -21,14 +20,12 @@ then    echo "usage: $(basename $0) [option]"
 fi
 
 # Default operations
-del_opt="--remove-sent-files"
 dry_run=""
 prefix="bwi"
 
 # Get parameters
-while getopts 'knp:' opt; do
+while getopts 'np:' opt; do
     case $opt in
-        k)  del_opt=""       ;;
         n)  dry_run="-n"     ;;
         p)  prefix="$OPTARG" ;;
         *)  exit 1           ;;
@@ -55,4 +52,4 @@ then    echo "No files matching $glob found."
 fi
 
 # Upload the data
-exec $RSYNC -avz $dry_run $del_opt -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
+exec $RSYNC -avz $dry_run -e 'ssh -p40' $glob $SERVER:$TARGET_DIR

@@ -25,7 +25,7 @@ fi
 
 # Default options
 compress=true
-del_opt=""
+keep_opt="true"
 dir=$DEFAULT_DIR
 dry_run=false
 prefix="bwi"
@@ -36,7 +36,7 @@ while getopts 'd:knp:' opt; do
     case $opt in
         c)  upload=false     ;;
         d)  dir="$OPTARG"    ;;
-        k)  del_opt="-k"     ;;
+        k)  keep_opt="false"  ;;
         n)  dry_run=true     ;;
         p)  prefix="$OPTARG" ;;
         u)  compress=false   ;;
@@ -84,8 +84,12 @@ fi
 if $upload
 then    # upload any compressed bags
         cd $COMPRESSED
-        exec bwilab upload -p $prefix $del_opt
-        # should NOT return
+        bwilab upload -p $prefix
+        if $? = 0 && $keep_opt
+        then    mkdir -p ../kept
+                /bin/mv $glob ../kept
+        else    /bin/rm $glob
+        fi
 fi
 
 exit $?
