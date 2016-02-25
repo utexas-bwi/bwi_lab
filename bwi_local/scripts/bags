@@ -32,7 +32,7 @@ prefix="bwi"
 upload=true
 
 # Get parameters
-while getopts 'd:knp:' opt; do
+while getopts 'cd:knp:u' opt; do
     case $opt in
         c)  upload=false     ;;
         d)  dir="$OPTARG"    ;;
