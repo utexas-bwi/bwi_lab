@@ -28,29 +28,41 @@ Example
 bags
 ----
 
-Compress and upload bag files to the main BWI server.  The bags are
-normally stored in ``~/.ros/bwi/bwi_logging`` for the current user.
-The compressed bags are stored in a subdirectory named ``compressed``,
-and the uncompressed files deleted.  With the ``-k`` option,
-successfully-uploaded compressed bags are saved in a subdirectory
-named ``kept``.
+Compress and upload files matching ``$PREFIX_*.bag`` to the main BWI
+server.  These bags are normally stored in ``~/.ros/bwi/bwi_logging``.
+Successfully uploaded compressed bags are either deleted or optionally
+saved in a subdirectory named ``kept``.
 
 Usage
 '''''
 ::
 
-    $ bwi bags [options]
+    $ bwi bags [options] PREFIX
 
 Options::
 
     -c  compress only, do not upload
     -d  directory containing bags (default: "~/.ros/bwi/bwi_logging")
-    -h  [--help] print help message
+    -h  print help message
     -k  keep the compressed files after uploading"
     -n  dry run, only prints bag info for the selected files
-    -p  file name prefix, handle files matching "PREFIX_*.bag".
-        (default is "bwi")
     -u  upload only, do not compress
+
+Example
+'''''''
+
+Upload the bags that are normally collected for all robot runs::
+
+    $ bwi bags bwi
+
+Upload extra bags collected for some specific experiment, which may be
+much larger than our default message topics::
+
+    $ bwi bags -k extra
+
+The ``-k`` option causes all matching bags to be stored in
+``~/.ros/bwi/bwi_logging/kept`` after being sucessfully uploaded.
+
 
 bwi
 ---
@@ -66,7 +78,7 @@ Usage
 '''''
 ::
 
-    bwi script_name [ args ]
+    $ bwi script_name [ args ]
 
 clone_server
 ------------
@@ -99,7 +111,7 @@ Usage
 '''''
 ::
 
-    bwi distance_traveled bag1 [bag2 ...]
+    $ bwi distance_traveled bag1 [bag2 ...]
 
 Example
 '''''''
@@ -131,7 +143,7 @@ Usage
 '''''
 ::
 
-    bwi list_bags
+    $ bwi list_bags
 
 update_local
 ------------
@@ -143,11 +155,11 @@ Run this under the ``bwilab`` account, which should first have been
 given access via the ``authorize`` script.
 
 
-Usage
-'''''
+Example
+'''''''
 ::
 
-    bwi update_local ~/ws/install
+    $ bwi update_local ~/ws/install
 
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/

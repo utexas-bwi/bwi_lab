@@ -4,45 +4,61 @@
 
 DEFAULT_DIR=~/.ros/bwi/bwi_logging
 
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]
-then    echo "usage: $(basename $0) [options]"
-        echo ""
-        echo "Compress and upload bag files to the main BWI server."
-        echo "The compressed bags are stored in a subdirectory named"
-        echo "'compressed', and the uncompressed files deleted."
-        echo ""
-        echo "Options:"
-        echo -e "\t-c\tcompress only, do not upload"
-        echo -e "\t-d\tdirectory containing bags (default: $DEFAULT_DIR)"
-        echo -e "\t-h\t[--help] print this message"
-        echo -e "\t-k\tkeep the compressed files after uploading"
-        echo -e "\t-n\tdry run, only prints bag info for the selected files"
-        echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
-        echo -e "\t  \t(default is 'bwi')"
-        echo -e "\t-u\tupload only, do not compress"
-        exit 2
-fi
+# Function to print command argument usage:
+usage() {
+    echo "Usage: $(basename $0) [options] PREFIX"
+    echo ""
+    echo "Compress and upload files matching '\$PREFIX_*.bag' to the main BWI"
+    echo "server.  These bags are normally stored in '~/.ros/bwi/bwi_logging'."
+    echo "Successfully uploaded compressed bags are either deleted or optionally"
+    echo "saved in a subdirectory named 'kept'."
+    echo ""
+    echo "Options:"
+    echo -e "\t-c\tcompress only, do not upload"
+    echo -e "\t-d\tdirectory containing bags"
+    echo -e "\t  \t (default: $DEFAULT_DIR)"
+    echo -e "\t-h\tprint this message"
+    echo -e "\t-k\tkeep the compressed files after uploading"
+    echo -e "\t-n\tdry run, only prints bag info for the selected files"
+    echo -e "\t-u\tupload only, do not compress"
+}
 
 # Default options
 compress=true
-keep_opt="false"
 dir=$DEFAULT_DIR
 dry_run=false
-prefix="bwi"
+keep=false
 upload=true
 
-# Get parameters
-while getopts 'cd:knp:u' opt; do
+# Get optional parameters
+while getopts 'cd:hknu' opt; do
     case $opt in
         c)  upload=false     ;;
         d)  dir="$OPTARG"    ;;
-        k)  keep_opt="true"  ;;
+        h)  usage; exit 0    ;;
+        k)  keep=true        ;;
         n)  dry_run=true     ;;
-        p)  prefix="$OPTARG" ;;
         u)  compress=false   ;;
-        *)  exit 9           ;;
+        *)  usage; exit 9    ;;
     esac
 done
+
+# handle PREFIX positional parameter
+shift $((OPTIND-1))
+if [ $# != 1 ]
+then    shift
+        echo "Exactly one PREFIX parameter is required:"
+        usage; exit 9
+fi
+prefix=$1
+
+## debug output for parameter testing:
+echo -e "    compress: \t$compress"
+echo -e "    dir: \t$dir"
+echo -e "    dry_run: \t$dry_run"
+echo -e "    keep: \t$keep"
+echo -e "    prefix: \t$prefix"
+echo -e "    upload: \t$upload"
 
 suffix="_*.bag"
 glob=$prefix$suffix
@@ -60,7 +76,7 @@ then
         if /bin/ls $glob 1> /dev/null 2>&1
         then
                 # make sure rosbag command is accessible via some ROS environment
-                if ! $(which rosbag)
+                if ! /usr/bin/which rosbag >/dev/null
                 then    source /opt/ros/indigo/setup.bash
                 fi
 
@@ -77,15 +93,15 @@ then
                 if [ $? != 0 ]
                 then    exit $?
                 fi
-        else    echo "No new uncompressed files matching $glob found."
+        else    echo "No new files matching $glob found."
         fi
 fi
 
-if $upload
+if ! $dry_run && $upload
 then    # upload any compressed bags
         cd $COMPRESSED
         if bwilab upload -p $prefix
-        then    if $keep_opt
+        then    if $keep
                 then    mkdir -p ../kept
                         /bin/mv $glob ../kept
                 else    /bin/rm $glob
