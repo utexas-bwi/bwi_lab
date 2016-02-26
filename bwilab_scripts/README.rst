@@ -31,6 +31,7 @@ already on the server will not be sent again.
 Usage
 '''''
 ::
+
  $ bwilab upload [options] PREFIX
 
 Options::
