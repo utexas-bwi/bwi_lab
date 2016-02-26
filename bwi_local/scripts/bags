@@ -26,7 +26,7 @@ usage() {
 # Default options
 compress=true
 dir=$DEFAULT_DIR
-dry_run=false
+dry_run=""
 keep=false
 upload=true
 
@@ -37,7 +37,7 @@ while getopts 'cd:hknu' opt; do
         d)  dir="$OPTARG"    ;;
         h)  usage; exit 0    ;;
         k)  keep=true        ;;
-        n)  dry_run=true     ;;
+        n)  dry_run="-n"     ;;
         u)  compress=false   ;;
         *)  usage; exit 9    ;;
     esac
@@ -46,19 +46,18 @@ done
 # handle PREFIX positional parameter
 shift $((OPTIND-1))
 if [ $# != 1 ]
-then    shift
-        echo "Exactly one PREFIX parameter is required:"
+then    echo "Exactly one PREFIX parameter is required:"
         usage; exit 9
 fi
 prefix=$1
 
 ## debug output for parameter testing:
-echo -e "    compress: \t$compress"
-echo -e "    dir: \t$dir"
-echo -e "    dry_run: \t$dry_run"
-echo -e "    keep: \t$keep"
-echo -e "    prefix: \t$prefix"
-echo -e "    upload: \t$upload"
+#echo "  compress: $compress"
+#echo "  dir:      $dir"
+#echo "  dry_run:  $dry_run"
+#echo "  keep:     $keep"
+#echo "  prefix:   $prefix"
+#echo "  upload:   $upload"
 
 suffix="_*.bag"
 glob=$prefix$suffix
@@ -80,7 +79,7 @@ then
                 then    source /opt/ros/indigo/setup.bash
                 fi
 
-                if $dry_run
+                if [ "$dry_run" = "-n" ]
                 then    rosbag info $glob
                         # no upload done with -n
                         exit 0
@@ -97,10 +96,10 @@ then
         fi
 fi
 
-if ! $dry_run && $upload
+if $upload
 then    # upload any compressed bags
         cd $COMPRESSED
-        if bwilab upload -p $prefix
+        if bwilab upload $dry_run $prefix
         then    if $keep
                 then    mkdir -p ../kept
                         /bin/mv $glob ../kept

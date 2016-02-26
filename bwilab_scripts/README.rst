@@ -21,33 +21,48 @@ Uploads files from the current directory to the main BWI lab server.
 *This script is not normally run directly*.  Use the ``bags``
 script from `bwi_local`_, instead.
 
-The upload copies any new compressed bag files in the current
-directory to the server.  Only files with names matching a specified
-prefix and ending with ``.bag`` will be copied.
+The upload copies files matching ``$PREFIX_*.bag`` from the current
+directory to the main BWI server.
 
 Files on the server are stored in the ``~bwilab/robot/$HOSTNAME``
 directory.  ``$HOSTNAME`` should be set to the robot's name; if not
 defined, the output of the ``hostname`` command is used.  Files
 already on the server will not be sent again.
 
-Options::
-
-    -h  print a help message
-    -n  dry run, do nothing
-    -p  file name prefix, handle files matching ``PREFIX_*.bag``
-        (default is ``bwi``)
 
 Usage
 '''''
+::
+ $ bwilab upload [options] PREFIX
+
+Options::
+
+    -h  print a help message
+    -n  dry run, do no transfers
+
+The ``PREFIX`` parameter is *required*.
+
+All robot runs normally collect a moderate number of messages with the
+``bwi`` prefix.  Those bags are always intended to be uploaded to the
+server.  Extra bags may be collected for specific experiments. Because
+they may be much larger than our ``bwi`` bags, they are normally
+uploaded manually, when needed.
+
+Examples
+''''''''
 
 To upload compressed bag files for the current user::
 
-    cd ~/.ros/bwi/bwi_logging/compressed
-    bwilab upload
+    $ cd ~/.ros/bwi/bwi_logging/compressed
+    $ bwilab upload bwi
+
+To Upload ``extra`` bags collected for some specific experiment::
+
+    $ bwilab upload extra
 
 To force a specific host name::
 
-    HOSTNAME=bender bwilab upload
+    $ HOSTNAME=bender bwilab upload bwi
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/
 .. _`bwi_local`: https://github.com/utexas-bwi/bwi_lab/tree/master/bwi_local

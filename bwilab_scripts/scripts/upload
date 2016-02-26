@@ -4,33 +4,41 @@
 #
 #  MUST run using /bin/sh, because bash defeats the setuid authorization.
 
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]
-then    echo "usage: $(basename $0) [option]"
-        echo ""
-        echo "Uploads files from the current directory to the main BWI"
-        echo "server. \$HOSTNAME should be the lowest-level domain name."
-        echo "By default, delete the files successfully uploaded"
-        echo ""
-        echo "Supports these options:"
-        echo -e "\t-h [--help]\tprint this help message"
-        echo -e "\t-n\tdry run, do nothing"
-        echo -e "\t-p\tfile name prefix, handle files matching 'PREFIX_*.bag'"
-        echo -e "\t  \t(default is ``bwi``)"
-        exit 1
-fi
+# Function to print command argument usage:
+usage() {
+    echo "usage: $(basename $0) [options] PREFIX"
+    echo ""
+    echo "Uploads files from the current directory to the main BWI"
+    echo "server. \$HOSTNAME should be set to the robot's name."
+    echo ""
+    echo "Supports these options:"
+    echo "  -h  print this help message"
+    echo "  -n  dry run, do no transfers"
+}
 
 # Default operations
 dry_run=""
-prefix="bwi"
 
 # Get parameters
-while getopts 'np:' opt; do
+while getopts 'nh' opt; do
     case $opt in
         n)  dry_run="-n"     ;;
-        p)  prefix="$OPTARG" ;;
-        *)  exit 1           ;;
+        h)  usage; exit 0    ;;
+        *)  usage; exit 9    ;;
     esac
 done
+
+# handle PREFIX positional parameter
+shift $((OPTIND-1))
+if [ $# != 1 ]
+then    echo "Exactly one PREFIX parameter is required:"
+        usage; exit 9
+fi
+prefix=$1
+
+## debug output for parameter testing:
+echo "    dry_run:  $dry_run"
+echo "    prefix:   $prefix"
 
 suffix="_*.bag"
 glob=$prefix$suffix
@@ -47,7 +55,7 @@ TARGET_DIR=~bwilab/robot/$HOSTNAME
 
 # See if there are bags to upload
 if ! /bin/ls $glob 1> /dev/null 2>&1
-then    echo "No files matching $glob found."
+then    echo "No files matching $glob to upload."
         exit 1
 fi
 
