@@ -37,8 +37,8 @@ fi
 prefix=$1
 
 ## debug output for parameter testing:
-echo "    dry_run:  $dry_run"
-echo "    prefix:   $prefix"
+#echo "    dry_run:  $dry_run"
+#echo "    prefix:   $prefix"
 
 suffix="_*.bag"
 glob=$prefix$suffix
