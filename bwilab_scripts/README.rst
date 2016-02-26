@@ -16,13 +16,11 @@ Scripts
 upload
 ------
 
-Uploads files from the current directory to the main BWI lab server.
+Uploads files matching ``$PREFIX_*.bag`` from the current directory to
+the main BWI server.
 
 *This script is not normally run directly*.  Use the ``bags``
 script from `bwi_local`_, instead.
-
-The upload copies files matching ``$PREFIX_*.bag`` from the current
-directory to the main BWI server.
 
 Files on the server are stored in the ``~bwilab/robot/$HOSTNAME``
 directory.  ``$HOSTNAME`` should be set to the robot's name; if not
@@ -60,7 +58,7 @@ To Upload ``extra`` bags collected for some specific experiment::
 
     $ bwilab upload extra
 
-To force a specific host name::
+To force a specific robot name::
 
     $ HOSTNAME=bender bwilab upload bwi
 
