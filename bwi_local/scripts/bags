@@ -3,6 +3,7 @@
 ## Compress and upload bag files for BWI log data.
 
 DEFAULT_DIR=~/.ros/bwi/bwi_logging
+LOGGER=/usr/bin/logger          # syslog command
 
 # Function to print command argument usage:
 usage() {
@@ -86,9 +87,11 @@ then
                 fi
 
                 # Compress the bags
+                $LOGGER 'compressing BWI logs...'
                 if rosbag compress --output-dir=$COMPRESSED $glob
                 then    /bin/rm -f $glob
                 fi
+                $LOGGER 'completed BWI logs compression'
                 if [ $? != 0 ]
                 then    exit $?
                 fi
@@ -99,6 +102,7 @@ fi
 if $upload
 then    # upload any compressed bags
         cd $COMPRESSED
+        $LOGGER 'starting BWI logs upload...'
         if bwilab upload $dry_run $prefix
         then    if $keep
                 then    mkdir -p ../kept
@@ -106,6 +110,7 @@ then    # upload any compressed bags
                 else    /bin/rm $glob
                 fi
         fi
+        $LOGGER 'completed BWI logs upload'
 fi
 
 exit $?
