@@ -22,6 +22,7 @@ usage() {
     echo -e "\t-k\tkeep the compressed files after uploading"
     echo -e "\t-n\tdry run, only prints bag info for the selected files"
     echo -e "\t-u\tupload only, do not compress"
+    echo -e "\t-w\tnumber of seconds to wait before starting"
 }
 
 # Default options
@@ -30,9 +31,10 @@ dir=$DEFAULT_DIR
 dry_run=""
 keep=false
 upload=true
+waitsecs=0
 
 # Get optional parameters
-while getopts 'cd:hknu' opt; do
+while getopts 'cd:hknuw:' opt; do
     case $opt in
         c)  upload=false     ;;
         d)  dir="$OPTARG"    ;;
@@ -40,6 +42,7 @@ while getopts 'cd:hknu' opt; do
         k)  keep=true        ;;
         n)  dry_run="-n"     ;;
         u)  compress=false   ;;
+        w)  waitsecs=$OPTARG ;;
         *)  usage; exit 9    ;;
     esac
 done
@@ -59,6 +62,11 @@ prefix=$1
 #echo "  keep:     $keep"
 #echo "  prefix:   $prefix"
 #echo "  upload:   $upload"
+#echo "  waitsecs:   $waitsecs"
+
+if [ $waitsecs -gt 0 ]
+then    echo "waiting $waitsecs seconds before starting."
+fi
 
 suffix="_*.bag"
 glob=$prefix$suffix

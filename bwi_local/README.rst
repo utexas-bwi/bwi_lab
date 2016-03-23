@@ -47,6 +47,7 @@ Options::
     -k  keep the compressed files after uploading"
     -n  dry run, only prints bag info for the selected files
     -u  upload only, do not compress
+    -w  number of seconds to wait before starting
 
 Example
 '''''''
@@ -63,6 +64,9 @@ much larger than our default message topics::
 The ``-k`` option causes all matching bags to be stored in
 ``~/.ros/bwi/bwi_logging/kept`` after being sucessfully uploaded.
 
+Wait 20 seconds before staring the upload::
+
+    $ bwi bags -w20 bwi
 
 bwi
 ---
