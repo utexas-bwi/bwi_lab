@@ -27,6 +27,9 @@ install(PROGRAMS
           scripts/update_local
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+install(FILES completion/bwi_local-completion.bash
+        DESTINATION etc/bash_completion.d)
+
 #############
 ## Testing ##
 #############

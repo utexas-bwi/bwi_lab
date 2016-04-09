@@ -13,7 +13,7 @@ then    echo "usage: `basename $0`"
 fi
 
 # These directories allow bwilab to install things:
-DIRS="bin lib lib/python2.7/dist-packages share"
+DIRS="bin etc lib lib/python2.7/dist-packages share"
 
 cd /usr/local
 /bin/chmod g+w $DIRS
