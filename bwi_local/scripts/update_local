@@ -13,5 +13,5 @@ fi
 ## TODO: find a better tree copy command that does not try to set
 ## directory permissions. This works, but prints bogus error messages.
 cd $1
-find bin lib share | cpio -pvud /usr/local
+find bin etc lib share | cpio -pvud /usr/local
 exit $?
