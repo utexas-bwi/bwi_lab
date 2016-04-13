@@ -18,5 +18,5 @@ DIRS="bin etc lib lib/python2.7/dist-packages share"
 cd /usr/local
 /bin/chmod g+w $DIRS
 /bin/chgrp bwilab $DIRS
-/bin/ln -s etc/bash_completion.d/bwi_local-completion.bash /etc/bash_completion.d/
+/bin/ln -s /usr/local/etc/bash_completion.d/bwi_local-completion.bash /etc/bash_completion.d/
 exit $?
