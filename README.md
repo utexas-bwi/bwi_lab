@@ -27,7 +27,7 @@ repository, and build it.
  $ cd ~/ws/src
  $ git clone https://github.com/utexas-bwi/bwi_lab.git
  $ cd ..
- $ catkin config --extend /opt/ros/indigo --install
+ $ catkin config --extend /opt/ros/$ROS_DISTRO --install
  $ catkin build
 ```
 
