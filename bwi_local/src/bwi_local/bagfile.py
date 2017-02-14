@@ -59,31 +59,32 @@ def distance_traveled(filename):
 
     try:
         bag = rosbag.Bag(filename)
-    except IOError:
-        return 0, 0.0, filename
 
-    time_start = -1
-    total_distance = 0.0
-    time_current = -1
-    x = None
-    y = None
+        time_start = -1
+        total_distance = 0.0
+        time_current = -1
+        x = None
+        y = None
 
-    for topic, msg, t in bag.read_messages(topics=['odom_1hz']):
+        for topic, msg, t in bag.read_messages(topics=['odom_1hz']):
 
-        time_current = int(msg.header.stamp.secs)
-        x_current = float(msg.pose.pose.position.x)
-        y_current = float(msg.pose.pose.position.y)
+            time_current = int(msg.header.stamp.secs)
+            x_current = float(msg.pose.pose.position.x)
+            y_current = float(msg.pose.pose.position.y)
 
-        if time_start < 0:
+            if time_start < 0:
+                x = x_current
+                y = y_current
+                time_start = time_current
+                continue
+
+            total_distance += ((x_current - x)**2 + (y_current - y)**2)**0.5
             x = x_current
             y = y_current
-            time_start = time_current
-            continue
 
-        total_distance += ((x_current - x)**2 + (y_current - y)**2)**0.5
-        x = x_current
-        y = y_current
+        bag.close()
+        time_consumed = time_current - time_start
+        return time_consumed, total_distance, filename
 
-    bag.close()
-    time_consumed = time_current - time_start
-    return time_consumed, total_distance, filename
+    except IOError:
+        return 0, 0.0, filename
