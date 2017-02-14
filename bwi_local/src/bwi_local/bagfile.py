@@ -86,5 +86,5 @@ def distance_traveled(filename):
         time_consumed = time_current - time_start
         return time_consumed, total_distance, filename
 
-    except IOError:
+    except (IOError, rosbag.bag.ROSBagException):
         return 0, 0.0, filename
