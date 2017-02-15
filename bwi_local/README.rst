@@ -165,6 +165,38 @@ Example
 
     $ bwi update_local ~/ws/install
 
+yaml_index
+----------
+
+Creates a YAML index file containing the time comsumed and distance
+traveled for one or more ROS bag files listed on the command
+line. Invalid files, or names not ending in ".bag" are ignored.
+
+Usage
+'''''
+::
+
+    $ bwi yaml_index outfile.yaml bag1 [bag2 ...]
+
+Examples
+''''''''
+::
+
+    $ bwi yaml_index index.yaml bwi_2016-09*.bag
+
+This creates an ``index.yaml`` file in the current directory,
+containing data for all bags in that directory created in
+September of 2016.
+
+::
+
+    $ bwi yaml_index master_2016.yaml */bwi_2016-*.bag
+
+This ``master_2016.yaml`` index will contain data for all bags created
+in any subdirectory during 2016. Bag files are typically stored in a
+folder under the robot name. The unlikely possibility that two robots
+might create a bag file in the same second of the same day is ignored.
+
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/
 .. _ROS: http:/ros.org
