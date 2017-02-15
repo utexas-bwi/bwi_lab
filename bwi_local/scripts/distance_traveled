@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 2:
         print('error: no bag files named\n', file=sys.stderr)
-        print('usage: rosrun bwi_logging distance_traveled bag [bag2 ...]',
+        print('usage: bwi distance_traveled bag [bag2 ...]',
               file=sys.stderr)
         sys.exit(9)
 
