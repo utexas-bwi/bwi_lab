@@ -25,6 +25,7 @@ install(PROGRAMS
           scripts/keygen
           scripts/list_bags
           scripts/update_local
+          scripts/yaml_index
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES completion/bwi_local-completion.bash

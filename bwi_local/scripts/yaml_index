@@ -1,0 +1,44 @@
+#! /usr/bin/env python
+
+# enable some python3 compatibility options:
+from __future__ import absolute_import, print_function
+
+import datetime
+import sys
+import yaml
+from bwi_local.bagfile import distance_traveled
+
+if __name__ == '__main__':
+
+    if len(sys.argv) < 3:
+        print('error: no bag files named\n', file=sys.stderr)
+        print('usage: bwi yaml_index outfile.yaml bag [bag2 ...]',
+              file=sys.stderr)
+        sys.exit(9)
+
+    fp = open(sys.argv[1], 'w')         # output file object
+    index = {}                          # index of the logs
+    tot_time = 0
+    tot_dist = 0.0
+
+    for filename in sys.argv[2:]:
+
+        if not filename.endswith('.bag'):
+            continue
+
+        t, d, f = distance_traveled(filename)
+
+        index[f] = {'time': t, 'distance': d}
+        tot_time += t
+        tot_dist += d
+
+    # write log data index to YAML file
+    try:
+        yaml.dump(index, fp)
+    finally:
+        fp.close()
+
+    print('\ntotal time:     ' + "{0:.2f}".format(tot_time/3600.0) + ' hours' +
+          '\ntotal distance: ' + "{0:.2f}".format(tot_dist) + ' meters')
+
+    sys.exit(0)
