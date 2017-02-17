@@ -3,7 +3,6 @@
 # enable some python3 compatibility options:
 from __future__ import absolute_import, print_function
 
-import datetime
 import sys
 import yaml
 from bwi_local.bagfile import distance_traveled
