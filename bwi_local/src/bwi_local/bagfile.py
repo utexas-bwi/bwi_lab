@@ -54,12 +54,12 @@ def datetime_from_filename(filename):
 
     :returns: corresponding Python datetime.datetime object.
 
-    :note: this implementation assumes the name has a four-character
-           prefix and '.bag' suffix. A better implementation would
-           check that.
+    :note: This implementation assumes the base file name has a
+           four-character prefix and '.bag' suffix. A better
+           implementation would check that.
 
     """
-    return dateutil.parser.parse(filename[4:-4])
+    return dateutil.parser.parse(os.path.basename(filename)[4:-4])
 
 
 def distance_traveled(filename):
