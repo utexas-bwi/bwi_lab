@@ -34,15 +34,32 @@
 
 """.. module:: bagfile
 
-This Python module provides function for accessing information saved
+This Python module provides functions for accessing information saved
 in ROS bag files.
 
 """
 # enable some python3 compatibility options:
 from __future__ import absolute_import, print_function
 
+import dateutil.parser
 import os
 import rosbag
+
+
+def datetime_from_filename(filename):
+    """Create Python datetime object from bag file name.
+
+    :param: base name of bag file.
+    :type:  str
+
+    :returns: corresponding Python datetime.datetime object.
+
+    :note: this implementation assumes the name has a four-character
+           prefix and '.bag' suffix. A better implementation would
+           check that.
+
+    """
+    return dateutil.parser.parse(filename[4:-4])
 
 
 def distance_traveled(filename):
