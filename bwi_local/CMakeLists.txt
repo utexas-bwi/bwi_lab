@@ -30,7 +30,7 @@ set(${PROJECT_NAME}_SHELL_SCRIPTS
     scripts/list_bags
     scripts/update_local)
 install(PROGRAMS
-          ${${PROJECT_NAME}_SHELL_SCRIPTS
+          ${${PROJECT_NAME}_SHELL_SCRIPTS}
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES completion/${PROJECT_NAME}-completion.bash
