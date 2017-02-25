@@ -17,6 +17,7 @@ install(PROGRAMS scripts/bwi
 # Python scripts
 set(${PROJECT_NAME}_PY_SCRIPTS
     scripts/distance_traveled
+    scripts/plot_distance
     scripts/yaml_index)
 catkin_install_python(PROGRAMS ${${PROJECT_NAME}_PY_SCRIPTS}
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

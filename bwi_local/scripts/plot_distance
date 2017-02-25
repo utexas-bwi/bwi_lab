@@ -1,0 +1,64 @@
+#! /usr/bin/env python
+
+# enable some python3 compatibility options:
+from __future__ import absolute_import, print_function
+
+import bwi_local.bagfile
+import dateutil.parser
+import os
+import sys
+import yaml
+
+
+def get_datetime(dt):
+    """ get datetime from command argument.
+
+    :param: dt date and time representation compatible with Python dateutil parser.
+    :type str"
+
+    :returns: corresponding date object; otherwise prints error and exits
+    """
+
+    try:
+        return dateutil.parser.parse(os.path.basename(dt)).date()
+    except ValueError:
+        print('unrecognizable date format: ' + str(dt))
+        sys.exit(4)
+
+
+if __name__ == '__main__':
+
+    if len(sys.argv) < 3:
+        print('error: missing parameters\n', file=sys.stderr)
+        print('usage: bwi plot_distance index.yaml <start_date> <end_date>',
+              file=sys.stderr)
+        sys.exit(9)
+
+    fp = open(sys.argv[1], 'r')         # index file object
+    index = {}                          # index of the logs
+    try:
+        index = yaml.safe_load(fp)
+    except:
+        print('unable to load index file: ' + sys.argv[1])
+        sys.exit(3)
+    finally:
+        fp.close()
+
+    if not index:
+        print('empty load index file: ' + sys.argv[1])
+        sys.exit(3)
+
+    start_time = get_datetime(os.path.basename(sys.argv[2]))
+    end_time = get_datetime(os.path.basename(sys.argv[3]))
+
+    print(str(start_time) + ' ' + str(end_time))
+
+    for k, v in index.items():
+        dt = bwi_local.bagfile.datetime_from_filename(k)
+        if dt.date() < start_time or dt.date() >= end_time:
+            continue
+        if v['distance'] <= 0.0:
+            continue
+        print(str(dt.date()) + ': ' + str(v['distance']))
+
+    sys.exit(0)
