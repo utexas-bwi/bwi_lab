@@ -6,6 +6,8 @@ from __future__ import absolute_import, print_function
 import bwi_local.bagfile
 import datetime
 import dateutil.parser
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import os
 import sys
 import yaml
@@ -57,14 +59,29 @@ if __name__ == '__main__':
     if len(sys.argv) > 3:
         end_time = get_datetime(os.path.basename(sys.argv[3]))
 
-    print(str(start_time) + ' ' + str(end_time))
+    print('Plotting data from ' + str(start_time) + ' to ' + str(end_time))
+
+    # list of points to plot
+    pts = []
 
     for k, v in index.items():
         dt = bwi_local.bagfile.datetime_from_filename(k)
         if dt.date() < start_time or dt.date() >= end_time:
             continue
-        if v['distance'] <= 0.0:
+        dist = v['distance']
+        if dist <= 0.0:
             continue
-        print(str(dt.date()) + ': ' + str(v['distance']))
+        pts.append((dt, dist))
+        #print(str(dt.date()) + ': ' + str(dist))
+
+    #pts.sort()
+    #print(str(pts))
+    x, y = zip(*pts)
+
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+    plt.bar(x, y)
+    plt.gcf().autofmt_xdate()
+    plt.show()
 
     sys.exit(0)

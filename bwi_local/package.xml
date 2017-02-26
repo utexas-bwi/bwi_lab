@@ -26,6 +26,7 @@
 
   <exec_depend>openssh-client</exec_depend>
   <exec_depend>python-dateutil</exec_depend>
+  <exec_depend>python-matplotlib</exec_depend>
   <exec_depend>python-yaml</exec_depend>
   <exec_depend>rosbag</exec_depend>
   <exec_depend>rospy</exec_depend>
