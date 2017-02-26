@@ -4,6 +4,7 @@
 from __future__ import absolute_import, print_function
 
 import bwi_local.bagfile
+import datetime
 import dateutil.parser
 import os
 import sys
@@ -28,9 +29,9 @@ def get_datetime(dt):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 3:
-        print('error: missing parameters\n', file=sys.stderr)
-        print('usage: bwi plot_distance index.yaml <start_date> <end_date>',
+    if len(sys.argv) < 1:
+        print('error: index file parameter required\n', file=sys.stderr)
+        print('usage: bwi plot_distance index.yaml [ <start_date> [ <end_date> ]]',
               file=sys.stderr)
         sys.exit(9)
 
@@ -44,12 +45,17 @@ if __name__ == '__main__':
     finally:
         fp.close()
 
-    if not index:
+    if not index:                       # is this necessary?
         print('empty load index file: ' + sys.argv[1])
         sys.exit(3)
 
-    start_time = get_datetime(os.path.basename(sys.argv[2]))
-    end_time = get_datetime(os.path.basename(sys.argv[3]))
+    start_time = datetime.date(datetime.MINYEAR, 1, 1)
+    if len(sys.argv) > 2:
+        start_time = get_datetime(sys.argv[2])
+
+    end_time = datetime.date(datetime.MAXYEAR, 12, 31)
+    if len(sys.argv) > 3:
+        end_time = get_datetime(os.path.basename(sys.argv[3]))
 
     print(str(start_time) + ' ' + str(end_time))
 
