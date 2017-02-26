@@ -23,7 +23,7 @@ def get_datetime(dt):
     try:
         return dateutil.parser.parse(os.path.basename(dt)).date()
     except ValueError:
-        print('unrecognizable date format: ' + str(dt))
+        print('unrecognizable date format: ' + str(dt), file=sys.stderr)
         sys.exit(4)
 
 
@@ -40,13 +40,13 @@ if __name__ == '__main__':
     try:
         index = yaml.safe_load(fp)
     except:
-        print('unable to load index file: ' + sys.argv[1])
+        print('unable to load index file: ' + sys.argv[1], file=sys.stderr)
         sys.exit(3)
     finally:
         fp.close()
 
     if not index:                       # is this necessary?
-        print('empty load index file: ' + sys.argv[1])
+        print('empty load index file: ' + sys.argv[1], file=sys.stderr)
         sys.exit(3)
 
     start_time = datetime.date(datetime.MINYEAR, 1, 1)
