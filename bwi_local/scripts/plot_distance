@@ -8,6 +8,7 @@ import datetime
 import dateutil.parser
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import numpy
 import os
 import sys
 import yaml
@@ -73,7 +74,7 @@ if __name__ == '__main__':
         dist = v['distance']
         if dist <= 0.0:
             continue
-        pts.append((dt, dist))
+        pts.append((dt.date(), dist))
         #print(str(dt.date()) + ': ' + str(dist))
         if first_date:
             first_date = min(first_date, dt.date())
@@ -86,13 +87,25 @@ if __name__ == '__main__':
 
     print(str(first_date))
     print(str(last_date))
-    #pts.sort()
-    #print(str(pts))
-    x, y = zip(*pts)
+    if not first_date:
+        print('no data within specified range of dates', file=sys.stderr)
+        sys.exit(5)
+    tdelta = last_date - first_date
+    print(str(tdelta))
+    nweeks = (tdelta.days + 7) // 7     # round number of weeks up
+    print(str(nweeks))
+
+    distances = numpy.zeros(nweeks)
+    dates = [first_date + datetime.timedelta(days=week*7) for week in range(nweeks)]
+    print(str(dates))
+
+    # collect all the distances for each week
+    for dt, dist in pts:
+        bucket = (dt - first_date).days // 7
+        distances[bucket] += dist
 
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator())
-    plt.bar(x, y)
+    plt.bar(dates, distances)
     plt.gcf().autofmt_xdate()
     plt.show()
 
