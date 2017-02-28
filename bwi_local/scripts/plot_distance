@@ -63,6 +63,8 @@ if __name__ == '__main__':
 
     # list of points to plot
     pts = []
+    first_date = None                   # first date recorded
+    last_date = None                    # last date recorded
 
     for k, v in index.items():
         dt = bwi_local.bagfile.datetime_from_filename(k)
@@ -73,7 +75,17 @@ if __name__ == '__main__':
             continue
         pts.append((dt, dist))
         #print(str(dt.date()) + ': ' + str(dist))
+        if first_date:
+            first_date = min(first_date, dt.date())
+        else:
+            first_date = dt.date()
+        if last_date:
+            last_date = max(last_date, dt.date())
+        else:
+            last_date = dt.date()
 
+    print(str(first_date))
+    print(str(last_date))
     #pts.sort()
     #print(str(pts))
     x, y = zip(*pts)
