@@ -60,7 +60,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 3:
         end_time = get_datetime(os.path.basename(sys.argv[3]))
 
-    print('Plotting data from ' + str(start_time) + ' to ' + str(end_time))
+    #print('Plotting data from ' + str(start_time) + ' to ' + str(end_time))
 
     # list of points to plot
     pts = []
@@ -85,19 +85,17 @@ if __name__ == '__main__':
         else:
             last_date = dt.date()
 
-    print(str(first_date))
-    print(str(last_date))
-    if not first_date:
+    if first_date:
+        print('Plotting data from ' + str(first_date) + ' to ' + str(last_date))
+    else:
         print('no data within specified range of dates', file=sys.stderr)
         sys.exit(5)
+
     tdelta = last_date - first_date
-    print(str(tdelta))
     nweeks = (tdelta.days + 7) // 7     # round number of weeks up
-    print(str(nweeks))
 
     distances = numpy.zeros(nweeks)
     dates = [first_date + datetime.timedelta(days=week*7) for week in range(nweeks)]
-    print(str(dates))
 
     # collect all the distances for each week
     for dt, dist in pts:
