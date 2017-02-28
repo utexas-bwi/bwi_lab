@@ -149,6 +149,38 @@ Usage
 
     $ bwi list_bags
 
+plot_distance
+-------------
+
+Plot the weekly distances traveled for a set of log files previously
+collected into a YAML index.
+
+see: the ``bwi yaml_index`` command
+
+Usage
+'''''
+::
+
+    $ bwi plot_distance index.yaml [ <start_date> [ <end_date> ]]
+
+The ``start_date`` and ``end_date`` can be used to limit the logs
+included.  The default ``start_date`` and ``end_date`` limits are the
+beginning and end of time.  The dates can be in any format recognized
+by the Python ``dateutils`` package.  To avoid confusion, the
+``yyyy-mm-dd`` (ISO 8601) format is recommended, matching the bag file
+names.
+
+Example
+'''''''
+
+Plot all logs included in the ``master_2016.yaml`` index::
+
+    $ bwi plot_distance master_2016.yaml
+
+Plot only the September logs included in the ``master_2016.yaml`` index::
+
+    $ bwi plot_distance master_2016.yaml 2016-09-01 2016-10-01
+
 update_local
 ------------
 
@@ -193,9 +225,8 @@ September of 2016.
     $ bwi yaml_index master_2016.yaml */bwi_2016-*.bag
 
 This ``master_2016.yaml`` index will contain data for all bags created
-in any subdirectory during 2016. Bag files are typically stored in a
-folder under the robot name. The unlikely possibility that two robots
-might create a bag file in the same second of the same day is ignored.
+in any subdirectory during 2016.  Bag files are typically stored in a
+folder under the robot name.
 
 
 .. _BWI: http://www.cs.utexas.edu/~larg/bwi_web/

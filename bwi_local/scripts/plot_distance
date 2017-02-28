@@ -32,7 +32,7 @@ def get_datetime(dt):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 1:
+    if len(sys.argv) < 2:
         print('error: index file parameter required\n', file=sys.stderr)
         print('usage: bwi plot_distance index.yaml [ <start_date> [ <end_date> ]]',
               file=sys.stderr)
