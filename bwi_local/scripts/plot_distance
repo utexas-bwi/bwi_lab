@@ -74,8 +74,7 @@ if __name__ == '__main__':
         dist = v['distance']
         if dist <= 0.0:
             continue
-        pts.append((dt.date(), dist))
-        #print(str(dt.date()) + ': ' + str(dist))
+        pts.append((dt.date(), dist/1000.0))
         if first_date:
             first_date = min(first_date, dt.date())
         else:
@@ -103,6 +102,7 @@ if __name__ == '__main__':
         distances[bucket] += dist
 
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.ylabel('weekly distance traveled (km)')
     plt.bar(dates, distances)
     plt.gcf().autofmt_xdate()
     plt.show()
