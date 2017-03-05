@@ -93,18 +93,33 @@ if __name__ == '__main__':
     tdelta = last_date - first_date
     nweeks = (tdelta.days + 7) // 7     # round number of weeks up
 
+    # collect all the distances for each week
     distances = numpy.zeros(nweeks)
     dates = [first_date + datetime.timedelta(days=week*7) for week in range(nweeks)]
-
-    # collect all the distances for each week
     for dt, dist in pts:
         bucket = (dt - first_date).days // 7
         distances[bucket] += dist
 
+    # sum the cumulative distances week by week
+    total_distance = 0.0
+    cumulative_distances = numpy.arange(nweeks)
+    for wk in range(nweeks):
+        total_distance += distances[wk]
+        cumulative_distances[wk] = total_distance
+
+    plt.figure(1)
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    plt.ylabel('weekly distance traveled (km)')
-    plt.bar(dates, distances)
+    plt.ylabel('km')
+    plt.title('cumulative distance traveled')
     plt.gcf().autofmt_xdate()
+    plt.plot(dates, cumulative_distances)
+
+    plt.figure(2)
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.ylabel('km')
+    plt.title('weekly distance traveled')
+    plt.gcf().autofmt_xdate()
+    plt.bar(dates, distances)
     plt.show()
 
     sys.exit(0)
