@@ -1,0 +1,459 @@
+#!/usr/bin/python 
+
+import sys
+import argparse
+import os
+import re
+import traceback
+import pprint
+from collections import defaultdict
+
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+
+
+ARG_EVAL_REGEXP = "\$\(\s*arg\s+([^)]+)\s*\)"
+FIND_REGEXP = "\$\(\s*find\s+([^)]+)\s*\)"
+
+class ArgParseVars:
+    argument_origins = defaultdict(dict)
+    command_args = None
+
+class ArgData:
+    def __init__(self,original_value,resolved_value,origin_file):
+        self.resolved_value = resolved_value
+        self.original_value = original_value 
+        self.origin_file = origin_file
+
+    def toString(self):
+        return "Resolved Value: '" + self.resolved_value +"' Original Value:'" + \
+             self.original_value + "' Origen: " + self.origin_file 
+
+"""class DebugInfo:
+    def __init__(self,tag,tag_name,launchfile):
+        self.tag = tag
+        self.tag_name = tag_name
+        self.launch_file = launchfile"""
+
+"""    def getDebugLine
+        debugLine = "" """
+
+def errmsg(message):
+    msg = "ERROR: " + message
+    #print msg
+    return msg
+
+def eval_arg(arg_value, arg_container, launchfile):
+    match = re.search(ARG_EVAL_REGEXP,arg_value)
+    if match:
+        evaluated_arg_name = match.group(1)
+        if evaluated_arg_name not in arg_container: 
+            err_msg = errmsg("Can't evaluate argument '" + evaluated_arg_name + 
+                "'. Its value have not been set in the current launch file '" + launchfile + "'")
+            raise KeyError(err_msg)
+        return (evaluated_arg_name,arg_container[evaluated_arg_name])
+    else:
+        return (None,None)
+
+def eval_all_args(arg_value, arg_container, launchfile):
+    evaluatedArgNamesAndData = {};
+    matches = re.finditer(ARG_EVAL_REGEXP,arg_value)
+    for match in matches:
+        evaluated_arg_name = match.group(1)
+        if evaluated_arg_name not in arg_container: 
+            err_msg = errmsg("Can't evaluate argument '" + evaluated_arg_name + 
+                "'. Its value have not been set in the current launch file '" + launchfile + "'")
+            raise KeyError(err_msg)
+        evaluatedArgNamesAndData[evaluated_arg_name] = arg_container[evaluated_arg_name]
+    else:
+        return evaluatedArgNamesAndData
+
+def substitute_arg(arg_value, arg_container, launchfile):
+    evaluatedNamesAndValues = eval_all_args(arg_value, arg_container, launchfile)
+    for arg_name,evaluated_data in evaluatedNamesAndValues.iteritems():
+           arg_regex = "\$\(\s*arg\s+" + arg_name + "\s*\)"
+           arg_value = re.sub(arg_regex,evaluated_data.resolved_value,arg_value)
+    return arg_value    
+
+def eval_conditionals(attributes, arg_container, arg_name ,launchfile):
+    isUnless = False
+    if 'if' in attributes: 
+        expression = attributes['if']
+        isUnless = False
+    elif 'unless':
+        expression = attributes['unless']
+        isUnless = True
+    else:  
+        err_msg = errmsg("Internal error. Misuse of 'eval_conditionals' function")  
+        raise RuntimeError(err_msg)
+
+    (resolved_arg_name,resolved_expr_data) = eval_arg(expression,arg_container,launchfile)
+
+    if resolved_expr_data is None:
+        err_msg = errmsg("Found unsupported expression '" + expression +"' in 'if' "
+            + " attribute. Currently only $(arg ) evaluation is supported. The commands $(eval), "
+            + "$(optenv) $(find) and $(eval) are currently not supported for 'if' and 'unless'"
+            + "attribute values. argument name: " + arg_name +"launch file: " + launchfile)
+        raise NotImplementedError(err_msg)
+    
+    if resolved_expr_data.resolved_value == "false" or resolved_expr_data.resolved_value == "0":
+        if isUnless:
+            return True 
+        else:
+            return False 
+    
+    if resolved_expr_data.resolved_value == "true" or resolved_expr_data.resolved_value == "1":
+        if isUnless:
+            return False
+        else:
+            return True 
+     
+    else:
+        err_msg = errmsg("Illegal evaluated value '" + resolved_expr_data.resolved_value + 
+            "' for conditional attribute of an argument. Only values '0','1','true,'false' are "
+            + "legal values for if/unless attributes. argument name: " + arg_name + 
+            " , original expression: " + expression + " ,launch file: " + launchfile)
+        raise ValueError(err_msg)
+    
+
+def find_package_in_directory(directory,package_name):
+    
+        dir_contents = os.listdir(directory)
+        
+        if package_name in dir_contents and os.path.exists(os.path.join(directory,\
+                package_name,"package.xml")): 
+            package_dir =  os.path.join(directory,package_name) 
+            return package_dir
+   
+        for ros_file in dir_contents:
+            file_path = os.path.join(directory,ros_file)
+            if os.path.isdir(file_path):
+                package_path =  find_package_in_directory(file_path,package_name)
+                if package_path is not None:
+                    return package_path
+
+        return None
+
+
+def find_package_path(filename, launchfile):
+    #
+    # Implement roscd functionality
+    #
+    match = re.search(FIND_REGEXP,filename)
+        
+    if not match:
+        return filename
+
+    package_name = match.group(1)
+       
+    ros_package_path = os.environ['ROS_PACKAGE_PATH'].split(":")
+    
+    for ros_package_location in ros_package_path:
+        if not os.path.exists(ros_package_location):
+            continue
+
+        if not os.path.isdir(ros_package_location):
+            print "'" + ros_package_location + "'' listed in $ROS_PACKAGE_PATH is not a directroy. " \
+                "Please verify your ROS_PACKAGE_PATH env variable.\n"
+            continue    
+
+        package_path = find_package_in_directory(ros_package_location,package_name)    
+        if package_path is not None:
+            filename = re.sub(FIND_REGEXP,package_path,filename)
+            return filename
+
+    raise IOError("Package '" + package_name + "' used in an <include> tag in launchfile"
+                    + launchfile + " cannot be found in ROS_PACKAGE_PATH. Please check the name or "
+                     "update ROS_PACKAGE_PATH\n")             
+    
+def set_arg_value():
+    pass
+
+
+def process_element_args(element,arg_container,curr_file_args, launchfile):
+    if element.tag == "arg":
+        arg_name = element.attrib["name"]
+        
+        # Dbg:
+        #pp = pprint.PrettyPrinter(depth=6)
+        #pprint.pprint(element.tag) 
+        #pprint.pprint(element.attrib)
+        
+        if 'if' in element.attrib or 'unless' in element.attrib:
+            if eval_conditionals(element.attrib,arg_container,arg_name,launchfile) == False:
+                if arg_name not in curr_file_args:
+                    curr_file_args[arg_name] = False
+                return
+
+        if (arg_name in curr_file_args) and (curr_file_args[arg_name] == True):
+                err_msg = errmsg("Argument's '" + arg_name + "' value has been set "
+                            "twice in the current launch file '" + launchfile+ "'")
+        
+        curr_file_args[arg_name] = True
+
+        if 'value' in element.attrib:
+            value = substitute_arg(element.attrib['value'],arg_container,launchfile)
+            arg_container[arg_name] = ArgData(element.attrib['value'],value,launchfile)
+        elif 'default' in  element.attrib:
+            value = substitute_arg(element.attrib['default'],arg_container,launchfile)
+            if arg_name not in arg_container:
+                arg_container[arg_name] = ArgData(element.attrib['default'],value,launchfile)
+        elif arg_name not in arg_container:
+            err_msg = errmsg("Found arg tag with no 'default' or 'value' attributes, and no value "
+                "passed to it from the predecor launch file. arg name: " + arg_name + "launchfile: "
+                 + launchfile);
+            raise KeyError(err_msg)
+    
+    elif element.tag == "group":
+        for child_element in element:
+            process_element_args(child_element,arg_container,curr_file_args,launchfile)
+
+
+def parse_launch_file(launchfile, arg_container,tab):
+       
+    xml_doc = ET.ElementTree(file=launchfile)
+    
+    root = xml_doc.getroot()
+    
+    curr_file_args = {}
+    print tab + "Parsing '" + launchfile + "'..."
+
+    ###
+    # Set argument values passed from predecessor launch file
+    ###
+    for child_element in root:
+            process_element_args(child_element,arg_container,curr_file_args,launchfile)
+            
+    if ArgParseVars.command_args.strict_conditionals:
+        for arg in curr_file_args:
+            if  curr_file_args[arg] == False: 
+                err_msg = errmsg("Found an argument with an 'if' conditional, but could not "
+                    "find its counterpart with an 'unless' conditional. These arguments tags "
+                    "were excluded as their condition evaluated to false. While techincaly " 
+                    "this is legal, it leads to missing arguments and could imply a potential " 
+                    "human error. Use the '-nostrictconditionals' flag to skip this error. launch "
+                    "file: " + launchfile + " --- arg names: " + ', '.join(curr_file_args.keys()))
+                raise SyntaxError(err_msg)
+
+    ####
+    # Find all the arg evaluations here. Scan all tags and all 
+    # attributes. Exlude <arg> with the name same as the evaluated argument. 
+    # This means are inside include statments and are passed to the next launch file,
+    # or going to be evaluated elsewhere in the file 
+    ####
+    for element in xml_doc.iter():
+        for attribute in element.attrib.keys():
+            value = element.attrib[attribute]
+            evaluatedNamesAndValues = eval_all_args(value,arg_container,launchfile)
+            for arg_name,evaluated_arg_data in evaluatedNamesAndValues.iteritems():
+                if evaluated_arg_data != None:
+                    if (element.tag == "arg") and (element.attrib["name"] == arg_name): 
+                        pass
+                    elif launchfile in ArgParseVars.argument_origins.get(arg_name,{}):
+                        pass
+                    else:
+                        ArgParseVars.argument_origins[arg_name][launchfile] = evaluated_arg_data
+    
+    ###
+    # Find <include> tags, evalute arguments, and parse the next launch files
+    ###
+    for element in xml_doc.iterfind(".//include"):
+        
+        orig_filename =  element.attrib["file"]
+        filename =  find_package_path(orig_filename,launchfile)
+        
+        next_arg_container = {}
+        
+        for child_arg_element in element.findall("arg"):
+            arg_name = child_arg_element.attrib["name"]
+            if 'if' in child_arg_element.attrib or 'unless' in child_arg_element.attrib:
+                if eval_conditionals(child_arg_element.attrib,arg_container,arg_name,launchfile) == False:
+                    continue
+
+            if 'value' in child_arg_element.attrib:
+                arg_value = child_arg_element.attrib['value']
+            elif 'default' in child_arg_element.attrib:
+                arg_value = child_arg_element.attrib['default']
+                if arg_name in arg_container :
+                    arg_value = "$(arg " + arg_name + ")"
+            else:
+                err_msg = errmsg("In an include statment, Found an arg tag without 'value' or 'default'" 
+                    "attributes. Argument value must be passed explisitly with the 'value' attribute, "
+                    "nothing else is currently supported. Include file:" + orig_filename + ", arg name: " 
+                    + arg_name + " ,launch file: " + launchfile)
+                raise KeyError(err_msg)
+
+            if arg_name in next_arg_container:
+                err_msg = errmsg("argument '" + arg_name + "' has been " 
+                    "passed twice in the <include> statement for the file " + filename+ ".arg name: "
+                     + arg_name + " ,launch file: " + launchfile)
+                raise KeyError(err_msg)
+
+            #TODO: Add option of full tracking history
+            (resolved_arg_name,arg_data) =  eval_arg(arg_value,arg_container, launchfile)
+            resolved_arg_value =substitute_arg(arg_value,arg_container,launchfile)
+            
+            # If value is "$(arg = <arg_name> then retain origen trace. Otherwise, reset the origen to be of this file
+            if (arg_data is not None) and (arg_name == resolved_arg_name) and \
+                    (resolved_arg_value == arg_data.resolved_value):  
+                next_arg_container[arg_name] = arg_data;
+            else:
+                next_arg_container[arg_name] = ArgData(arg_value,resolved_arg_value,launchfile)
+                
+        parse_launch_file(filename, next_arg_container, tab+"\t")
+
+
+def print_all_arguments():
+    print "\n"
+    print "---------------------------------------------------\n"
+    print "All arguments as seen from entry point:\n"
+
+    args_by_filename = {}
+    for argname in ArgParseVars.argument_origins:
+        for filename in ArgParseVars.argument_origins[argname]:
+            if filename not in args_by_filename:
+                args_by_filename[filename] = []
+            args_by_filename[filename].append(argname) 
+    
+    for filename in args_by_filename:
+        print " Launch file '" + filename + "':"
+        for argname in args_by_filename[filename]:
+            arg_data = ArgParseVars.argument_origins[argname][filename]
+            print  " ---  Name: '" + argname + "''  "+ arg_data.toString() + "\n"
+
+    print "\n\n"      
+
+
+def print_argument_trace(argname):
+    print "\n"
+    print "---------------------------------------------------\n\n"
+    print "All argument '" + argname + "'' evaluations in the launch file tree:" + "\n"
+
+    if argname not in ArgParseVars.argument_origins:
+        err_msg = errmsg("Cannot find the argument '"+ argname +"' in any of the "
+            "launch files called from the entry point. Please check you spelling")
+        raise KeyError(err_msg)
+
+    for filename in ArgParseVars.argument_origins[argname]:
+        arg_data = ArgParseVars.argument_origins[argname][filename]
+        print " Launch file '" + filename + "':"
+        print " --- " + "Name: '" + argname + "''  "+ arg_data.toString() + "\n"
+    print "\n\n"
+
+
+def print_argument_origin(argname,filename):
+    print "\n"
+    print "---------------------------------------------------\n\n"
+    
+    if filename is None or filename == "":
+        err_msg = errmsg("target file name has not been provided, cannot execute "
+            "with the '-traceback' flag without a target filename. Please provide" 
+            " it with the '-filename' flag or append it to the '-argname' value with a ':' character.")
+        raise IOError(err_msg)
+    filename = os.path.abspath(filename)
+    if argname not in  ArgParseVars.argument_origins:
+        err_msg = errmsg("Cannot find argument '" + argname + "' in any of the " 
+            "launch files expanded by the entry point lauch file '"    + launchfile + 
+             "'. Sure about the name spelling?")
+        raise KeyError(err_msg)
+    if filename not in ArgParseVars.argument_origins.get(argname,{}):
+        err_msg = errmsg(" Argument '" +  argname + "' is not being evaluated in"
+            "the requested file '" + filename + "'")
+        raise KeyError(err_msg)
+
+    arg_data = ArgParseVars.argument_origins[argname][filename]
+    print " Origen of argument '" + argname + "'' as evaluated in launch file '" + filename + "\n"
+    print " --- " + arg_data.toString() + "\n"
+
+
+def parse_arguments(argv):
+    arg_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                    description = 
+                    "Trace arguments between different launch files as these arguments \n"
+                    "would be seen when running an a specific launch file with 'roslaunch' \n" 
+                    "command. All the arguments in all launch files included in the entry \n"
+                    "point launch file (and their descendants, recuresivly) will be evaluated \n"
+                    "for their origen and value.", 
+                    epilog =
+                    "\nExamples:\n"
+                    "trace_arguments -launchfile ../../mylaunch.launch\n"
+                    "trace_arguments -launchfile ../../mylaunch.launch -argname tp_prefix\n"
+                    )
+
+    arg_parser.add_argument('-launchfile', action = "store", dest = "launch_file", 
+                    required = True, help = "Entry point launchfile (required)")
+    arg_parser.add_argument('-argname', action = "store", dest = "arg_name", help = "argument "
+                    "name to trace. If not provided, all arguments will be traced")
+    arg_parser.add_argument('-filename', action = "store", dest = "file_name", 
+                    help= "location of the argument to be traced ")
+    arg_parser.add_argument('-tracebackwards', action = "store_false", dest = "trace_forward", 
+                    help = "trace the argument as evaluated in the file provided by the " 
+                    "'-filename' flag.\n Will trace all the way up to the top.", default = True)
+    arg_parser.add_argument('-nostrictconditionals', action = "store_false", dest=
+                    "strict_conditionals", default=True)
+    #arg_parser.add_argument('-traceforward', action = "store_true", dest = "trace_forward", 
+    #               help = "default")
+    
+    ArgParseVars.command_args = arg_parser.parse_args(argv)
+    
+    print ArgParseVars.command_args
+
+    if (ArgParseVars.command_args.arg_name is not None)  and \
+            (ArgParseVars.command_args.file_name is not None):
+        arg_name = ArgParseVars.command_args.arg_name
+        file_name =  ArgParseVars.command_args.file_name   
+    elif ArgParseVars.command_args.arg_name is not None:
+        arg_name_and_file = ArgParseVars.command_args.arg_name.split(':')
+        arg_name = arg_name_and_file[0]
+        if len(arg_name_and_file) == 1:
+            file_name = None
+        else:
+            file_name = arg_name_and_file[1]
+    else:
+        arg_name = None
+        file_name = None
+
+    return (arg_name,file_name)
+
+
+def create_arg_tree(launchfile):
+    arg_container = {}
+    if not os.path.exists(launchfile):
+        print "\nERROR: Cannot find the entry launch file '" + launchfile + \
+            "' provided with the '-launchfile' flag. Sure it's the right name?\n"
+        sys.exit(0)
+    try:
+        parse_launch_file(launchfile,arg_container,"")
+    #except ArgParseError:
+    except Exception as inst:
+        tb = traceback.format_exc()
+        print tb
+        sys.exit(0)    
+
+
+def main(argv):
+    filename = ""
+    argname = ""
+
+    (search_arg,search_file) = parse_arguments(argv)    
+    launchfile = ArgParseVars.command_args.launch_file
+    create_arg_tree(launchfile)
+
+    if search_arg is None:
+        print_all_arguments()
+    elif ArgParseVars.command_args.trace_forward == True:
+        print_argument_trace(search_arg)
+    else:    
+        print_argument_origin(search_arg,search_file)
+
+
+if  __name__ == "__main__":
+    main(sys.argv[1:])
+
+
+
+
+
+
