@@ -65,4 +65,4 @@ user can run selected commands on the BWI server:
 
 ```
 
-Be sure to do that under the ``bwilab`` user account.
+When it requests a passphrase, leave the field empty. Be sure to do that under the ``bwilab`` user account.
