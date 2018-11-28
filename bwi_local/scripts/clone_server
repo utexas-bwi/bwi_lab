@@ -14,4 +14,4 @@ RSYNC=/usr/bin/rsync
 SERVER=nixons-head.csres.utexas.edu
 TARGET_DIR=~bwilab/robot
 
-exec $RSYNC -avz -e 'ssh -p40' $SERVER:$TARGET_DIR .
+exec $RSYNC -avz -e 'ssh' $SERVER:$TARGET_DIR .

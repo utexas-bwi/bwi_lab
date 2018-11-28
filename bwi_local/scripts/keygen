@@ -14,7 +14,7 @@ SERVER=nixons-head.csres.utexas.edu
 KEYFILE=~/.ssh/id_rsa
 
 if /usr/bin/ssh-keygen -q -t rsa -f $KEYFILE
-then    cat $KEYFILE.pub | ssh -p40 $SERVER "cat >>  ~/.ssh/authorized_keys"
+then    cat $KEYFILE.pub | ssh $SERVER "cat >>  ~/.ssh/authorized_keys"
 else    echo 'ssh key generation failed'
         exit 9
 fi
