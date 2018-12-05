@@ -60,7 +60,7 @@ then    echo "No files matching $glob to upload."
 fi
 
 # Make sure the target directory exists:
-/usr/bin/ssh -p40 $SERVER mkdir -p $TARGET_DIR
+/usr/bin/ssh $SERVER mkdir -p $TARGET_DIR
 
 # Upload the data
-exec $RSYNC -avz $dry_run -e 'ssh -p40' $glob $SERVER:$TARGET_DIR
+exec $RSYNC -avz $dry_run -e 'ssh' $glob $SERVER:$TARGET_DIR
