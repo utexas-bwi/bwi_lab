@@ -62,7 +62,22 @@ user can run selected commands on the BWI server:
 
 ```
  $ bwi keygen
-
 ```
 
 When it requests a passphrase, leave the field empty. Be sure to do that under the ``bwilab`` user account.
+
+Update
+======
+
+The reason these scripts are stored in a separate repository and installed into ``/usr/local`` is so they can be updated without affecting each user's workspace.
+
+Assuming the steps above have already been performed, a new version can be updated while logged in to the ``bwilab`` account like this:
+
+```
+ $ cd ~/ws/src/bwi_lab
+ $ git pull
+ $ cd ../..
+ $ catkin build
+ $ source install/setup.bash
+ $ rosrun bwi_local update_local install
+```
